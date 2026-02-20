@@ -1,0 +1,49 @@
+# ==========================================
+# 1. Python & Virtual Environment
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# ==========================================
+# 2. Data & Output (Git에 올리지 않을 대용량/결과 파일)
+# ==========================================
+# data 폴더 하위의 모든 파일 무시 (단, 폴더 구조 유지를 위한 .gitkeep은 예외)
+data/*
+!data/.gitkeep
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/results/*
+!data/results/.gitkeep
+
+# figures 폴더 하위 이미지 무시 (마찬가지로 .gitkeep은 예외)
+figures/*
+!figures/.gitkeep
+
+# ==========================================
+# 3. Jupyter Notebook
+# ==========================================
+.ipynb_checkpoints/
+
+# ==========================================
+# 4. OS & Editor (macOS, VSCode, PyCharm 등)
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+.vscode/
+.idea/
+
+# ==========================================
+# 5. Logs & Caches
+# ==========================================
+*.log
+.pytest_cache/
