@@ -18,7 +18,7 @@ def unitary_matrix(params, n):
     """
     theta = params[0:int(n*(n-1)/2)]
     phi = params[int(n*(n-1)/2):(n*(n-1))]
-    d_params = params[(n*(n-1)):((n**2)-1)]
+    d_params = [1] + list(params[(n*(n-1)):((n**2)-1)])
 
     t_matrix = np.eye(n, dtype=complex)
     d_matrix = np.eye(n, dtype=complex)
@@ -29,8 +29,8 @@ def unitary_matrix(params, n):
 
     for s_idx, order in enumerate(s):
         bs = np.array([
-            [np.exp(1j*phi)*np.cos(theta[s_idx]), -np.sin(theta[s_idx])],
-            [np.exp(1j*phi)*np.sin(theta[s_idx]), np.cos(theta[s_idx])],
+            [np.exp(1j*phi[s_idx])*np.cos(theta[s_idx]), -np.sin(theta[s_idx])],
+            [np.exp(1j*phi[s_idx])*np.sin(theta[s_idx]), np.cos(theta[s_idx])],
         ])
         t_component = np.eye(n, dtype=complex)
         t_component[order-1:order+1, order-1:order+1] = bs
@@ -42,3 +42,22 @@ def unitary_matrix(params, n):
     matrix = d_matrix@t_matrix
 
     return matrix
+
+
+def get_discrimination_rates(state, measure, prior_probability):
+    P_success = 0
+    P_error = 0
+    P_fail = 0
+    for state_idx, state in enumerate(state):
+        prob = prior_probability[state_idx]
+        for povm_idx in range(len(measure)):
+            measurement = measure[f"M{povm_idx}"]
+            rho = state if np.array(state).ndim == 2 else np.outer(state, np.conj(state))
+            M = measurement if measurement.ndim == 2 else np.outer(measurement, np.conj(measurement))
+            if povm_idx == 0:
+                P_fail += prob * np.real(np.trace(rho @ M))
+            elif povm_idx - state_idx == 1:
+                P_success += prob * np.real(np.trace(rho @ M))
+            else:
+                P_error += prob * np.real(np.trace(rho @ M))
+    return P_success, P_error, P_fail

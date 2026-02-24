@@ -7,7 +7,7 @@ kiwisolver==1.4.5
 matplotlib==3.5.3
 numpy==1.21.6
 OAM_KIST==0.2.27
-opencv-python==4.13.0.92
+opencv-python==4.8.0.74
 osqp==0.6.7.post3
 packaging==24.0
 Pillow==9.5.0
