@@ -1,7 +1,10 @@
+import time
 import yaml
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
+
+from datetime import datetime
+from pathlib import Path
+from tqdm import trange
 from scipy.optimize import minimize
 
 from src.utils.quantum_states import *
@@ -17,7 +20,9 @@ tol = config['optimization']['tol']
 rhobeg = eval(config['optimization']['rhobeg'])
 max_iter = int(float(config['optimization']['maxiter']))
 
-lambda_val = config['simulation']['lambda_val']
+lambda_val = config['minimize']['lambda_val']
+
+minimize_params = config['minimize']
 
 columns = config['columns']
 # endregion
@@ -35,46 +40,79 @@ dim = len(prior_probability)
 # endregion
 
 
-# region theory curve
+# region theory data
 theory_df = pd.DataFrame(columns=columns['theory'])
+theory_dir = Path(f"../data/theory/dim_{dim}")
+theory_dir.mkdir(parents=True, exist_ok=True)
+theory_filename = f"ov{overlap}.csv"
+theory_filepath = theory_dir / theory_filename
 for fixed_rate in np.linspace(0, 1, 100):
     optimal_measurements = solve_sdp_bound(prepared_state_set, prior_probability, dim, fixed_rate)
-
     P_success, P_error, P_fail = get_discrimination_rates(rho_list, optimal_measurements, prior_probability)
-    row = [overlap, fixed_rate, P_success, P_error, P_fail]
-
-    theory_df = pd.concat([theory_df, pd.DataFrame([row], columns=columns['theory'])], ignore_index=True)
+    new_row = [overlap, fixed_rate, P_success, P_error, P_fail]
+    theory_df = pd.concat([theory_df, pd.DataFrame([new_row], columns=columns['theory'])], ignore_index=True)
+theory_df.to_csv(theory_filepath, index=False)
 # endregion
 
 
-for fixed_rate in np.linspace(0, overlap, 50):
-    obj = cobyla_objective
+# region simulation data
+sim_df = pd.DataFrame(columns=columns['sim data'])
+sim_history_df = pd.DataFrame([])
 
-    initial_parameter = np.random.uniform(0, 2*np.pi, size=((dim**2) - 1))
+current_time = datetime.now().strftime("%y%m%d_%H%M")
+sim_dir = Path(f"../data/simulation/dim_{dim}")
+sim_dir.mkdir(parents=True, exist_ok=True)
 
-    result = minimize(
-        obj,
-        initial_parameter,
-        args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val),
-        method=opt_method,
-        tol=tol,
-        options={
-            'rhobeg': rhobeg,
-            'maxiter': max_iter,
-            'disp': False,
-        }
-    )
+sim_filename = f"{current_time}_ov{overlap}.csv"
+sim_history_filename = f"{current_time}_ov{overlap}_history.csv"
 
-    vector_list = unitary_matrix(result.x, dim).T
+sim_filepath = sim_dir / sim_filename
+sim_history_filepath = sim_dir / sim_history_filename
 
-    optimal_measurements = {}
-    for vector_idx, vector in enumerate(vector_list):
-        optimal_measurements[f"M{np.mod(vector_idx + 1, dim)}"] = vector
+q_points = minimize_params['q_points']
+fixed_rates = np.linspace(0, overlap, q_points)
+best_lagrangians = np.full(q_points, -np.inf)
+best_histories = [[] for _ in range(q_points)]
+for trial in trange(minimize_params['trial'], desc="Trials"):
+    for fr_idx, fixed_rate in enumerate(fixed_rates):
+        parameter_history = []
 
-    P_success, P_error, P_fail = get_discrimination_rates(rho_list, optimal_measurements, prior_probability)
 
-    plt.scatter(fixed_rate, P_success, color='k', s=10)
-    plt.scatter(fixed_rate, P_error, color='r', s=10)
-    plt.scatter(fixed_rate, P_fail, color='k', s=10)
+        def tracking_objective(x, *args):
+            parameter_history.append(x.copy().tolist())
+            return cobyla_objective(x, *args)
 
-plt.show()
+        initial_parameter = np.random.uniform(0, 2*np.pi, size=((dim**2) - 1))
+        result = minimize(
+            tracking_objective,
+            initial_parameter,
+            args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val),
+            method=opt_method,
+            tol=tol,
+            options={
+                'rhobeg': rhobeg,
+                'maxiter': max_iter,
+                'disp': False,
+            }
+        )
+        lagrangian = -result.fun
+
+        vector_list = unitary_matrix(result.x, dim).T
+        optimal_measurements = {}
+        for vector_idx, vector in enumerate(vector_list):
+            optimal_measurements[f"M{np.mod(vector_idx + 1, dim)}"] = vector
+
+        P_success, P_error, P_fail = get_discrimination_rates(rho_list, optimal_measurements, prior_probability)
+        new_row = [overlap, trial, fixed_rate, P_success, P_error, P_fail, lagrangian]
+        sim_df = pd.concat([sim_df, pd.DataFrame([new_row], columns=columns['sim data'])], ignore_index=True)
+
+        if lagrangian > best_lagrangians[fr_idx]:
+            best_histories[fr_idx] = parameter_history
+            best_lagrangians[fr_idx] = lagrangian
+history_dict = {f"{fixed_rates[i]:.3f}": pd.Series(best_histories[i]) for i in range(q_points)}
+sim_history_df = pd.DataFrame(history_dict)
+sim_history_df.columns = pd.MultiIndex.from_product([["fixed rate"], sim_history_df.columns])
+
+sim_df.to_csv(sim_filepath, index=False)
+sim_history_df.to_csv(sim_history_filepath, index=False)
+# endregion

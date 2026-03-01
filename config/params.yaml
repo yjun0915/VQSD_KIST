@@ -7,6 +7,10 @@ optimization:
 
 simulation:
   q_points: 100
+
+minimize:
+  trial: 10
+  q_points: 10
   lambda_val: 3
 
 flags:
@@ -27,9 +31,12 @@ columns:
     - success rate
     - error rate
     - failure rate
-  raw parameter:
-    - best parameter
-    - worst parameter
-  optimal measurements:
+    - lagrangian
+  sim data:
     - overlap
+    - trial
     - fixed rate
+    - success rate
+    - error rate
+    - failure rate
+    - lagrangian
