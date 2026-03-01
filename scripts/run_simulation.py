@@ -15,10 +15,7 @@ from src.theory.discriminator import *
 with open("../config/params.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
-opt_method = config['optimization']['method']
-tol = config['optimization']['tol']
-rhobeg = eval(config['optimization']['rhobeg'])
-max_iter = int(float(config['optimization']['maxiter']))
+opt_config = config['optimization']['COBYLA']
 
 lambda_val = config['minimize']['lambda_val']
 
@@ -85,16 +82,10 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
 
         initial_parameter = np.random.uniform(0, 2*np.pi, size=((dim**2) - 1))
         result = minimize(
-            tracking_objective,
-            initial_parameter,
+            fun=tracking_objective,
+            x0=initial_parameter,
             args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val),
-            method=opt_method,
-            tol=tol,
-            options={
-                'rhobeg': rhobeg,
-                'maxiter': max_iter,
-                'disp': False,
-            }
+            **opt_config
         )
         lagrangian = -result.fun
 
@@ -104,7 +95,7 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
             optimal_measurements[f"M{np.mod(vector_idx + 1, dim)}"] = vector
 
         P_success, P_error, P_fail = get_discrimination_rates(rho_list, optimal_measurements, prior_probability)
-        new_row = [overlap, trial, fixed_rate, P_success, P_error, P_fail, lagrangian]
+        new_row = [overlap, trial, fixed_rate, P_success, P_error, P_fail, lagrangian, lambda_val, opt_config['method'], opt_config['options']['maxiter']]
         sim_df = pd.concat([sim_df, pd.DataFrame([new_row], columns=columns['sim data'])], ignore_index=True)
 
         if lagrangian > best_lagrangians[fr_idx]:

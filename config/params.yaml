@@ -1,9 +1,34 @@
 
 optimization:
-  method: "COBYLA"
-  tol: 1.0e-7
-  maxiter: 1e3
-  rhobeg: np.pi/2
+  COBYLA:
+    method: "COBYLA"
+    tol: 1.0e-7
+    options:
+      rhobeg: 1.570796
+      maxiter: 1000
+      disp: false
+  L-BFGS-B:
+    method: "L-BFGS-B"
+    tol: 1.0e-7
+    options:
+      maxiter: 1000
+      ftol: 1.0e-8
+      disp: false
+  Nelder-Mead:
+    method: "Nelder-Mead"
+    tol: 1.0e-7
+    options:
+      maxiter: 1000
+      xatol: 1.0e-4
+      fatol: 1.0e-4
+      disp: false
+  Powell:
+    method: "Powell"
+    tol: 1.0e-7
+    options:
+      maxiter: 1000
+      ftol: 1.0e-7
+      disp: false
 
 simulation:
   q_points: 100
@@ -32,6 +57,9 @@ columns:
     - error rate
     - failure rate
     - lagrangian
+    - lambda
+    - method
+    - maxiter
   sim data:
     - overlap
     - trial
@@ -40,3 +68,6 @@ columns:
     - error rate
     - failure rate
     - lagrangian
+    - lambda
+    - method
+    - maxiter

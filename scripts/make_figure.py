@@ -30,36 +30,33 @@ def plot_qsd_results(dim, overlap):
     df_theory = pd.read_csv(theory_path)
     df_sim = pd.read_csv(sim_path)
 
-    plt.figure(figsize=(8, 6))
+    fig, (ax1, ax0) = plt.subplots(1, 2, figsize=(10.46, 6), gridspec_kw={'width_ratios': [1, 1.81]})
 
-    plt.plot(df_theory['fixed rate'], df_theory['success rate'], label='SDP Bound (Theory)', color='dodgerblue', linestyle='-')
-    plt.plot(df_theory['fixed rate'], df_theory['error rate'], label='SDP Bound (Theory)', color='firebrick', linestyle='-')
-    plt.plot(df_theory['fixed rate'], df_theory['failure rate'], label='SDP Bound (Theory)', color='limegreen', linestyle='-')
+    ax0.plot(df_theory['fixed rate'], df_theory['success rate'], label='SDP Bound (Theory)', color='dodgerblue', linestyle='-')
+    ax0.plot(df_theory['fixed rate'], df_theory['error rate'], label='SDP Bound (Theory)', color='firebrick', linestyle='-')
+    ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], label='SDP Bound (Theory)', color='limegreen', linestyle='-')
 
     best_sim = df_sim.loc[df_sim.groupby('fixed rate')['lagrangian'].idxmax()]
 
-    plt.plot(best_sim['fixed rate'], best_sim['success rate'], 'o', color='dodgerblue', label='VQE Best Result')
-    plt.plot(best_sim['fixed rate'], best_sim['error rate'], 'o', color='firebrick', label='VQE Best Result')
-    plt.plot(best_sim['fixed rate'], best_sim['failure rate'], 'o', color='limegreen', label='VQE Best Result')
+    ax0.plot(best_sim['fixed rate'], best_sim['success rate'], 'o', color='dodgerblue', label='VQE Best Result')
+    ax0.plot(best_sim['fixed rate'], best_sim['error rate'], 'o', color='firebrick', label='VQE Best Result')
+    ax0.plot(best_sim['fixed rate'], best_sim['failure rate'], 'o', color='limegreen', label='VQE Best Result')
 
-    plt.xlabel('Fixed Rate (Error or Failure Constraint)')
-    plt.ylabel('Success Probability')
-    plt.title(f'Quantum State Discrimination (Dim={dim}, Overlap={overlap})')
-    plt.legend()
-    # plt.show()
+    ax0.set_xlabel('Fixed Rate (Error or Failure Constraint)')
+    ax0.set_ylabel('Success Probability')
+    ax0.set_title(f'Quantum State Discrimination (Dim={dim}, Overlap={overlap})')
+    ax0.legend()
 
     if history_path:
         df_hist = pd.read_csv(history_path)
 
-        col_name = df_hist.columns[0]
+        col_name = df_hist.columns[9]
 
         trajectory = df_hist[col_name].dropna().apply(ast.literal_eval).tolist()
         selected_fixed_rate = trajectory[0]
         trajectory = np.array(trajectory[1:])
 
-        fig, ax1 = plt.subplots(figsize=(7, 6))
         num_params = trajectory.shape[1] - 1
-        dim = np.sqrt(num_params + 1).astype(int)
         colors = [cspace_convert([70, 60, 360*(theta/num_params)], "CIELCh", "sRGB1") for theta in range(num_params)]
         colors = np.clip(colors, 0, 1)
 
@@ -80,13 +77,13 @@ def plot_qsd_results(dim, overlap):
         line_lag = ax2.plot(trajectory[:, -1], label=r'$\mathcal{L}$', color='firebrick', linewidth=1.5)
         lines += line_lag
         labels = [l.get_label() for l in lines]
-        ax1.legend(lines, labels, bbox_to_anchor=(1.2, 1), loc='upper left')
+        ax2.legend(lines, labels, bbox_to_anchor=(0.65, 1), loc='upper left', framealpha=0.7)
 
-        plt.xlabel('Optimization Iterations')
-        plt.ylabel('Parameter Value (rad)')
-        plt.title(f'Trajectory of Best Trial (@ fixed rate = {selected_fixed_rate})')
-        plt.tight_layout()
-        plt.show()
+        ax1.set_xlabel('Optimization Iterations')
+        ax1.set_ylabel('Parameter Value (rad)')
+        ax1.set_title(f'Trajectory (fixed rate = {selected_fixed_rate})')
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == "__main__":
