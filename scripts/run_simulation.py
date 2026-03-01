@@ -79,8 +79,9 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
 
 
         def tracking_objective(x, *args):
-            parameter_history.append(x.copy().tolist())
-            return cobyla_objective(x, *args)
+            current_lagrangian = cobyla_objective(x, *args)
+            parameter_history.append(x.copy().tolist() + [-current_lagrangian])
+            return current_lagrangian
 
         initial_parameter = np.random.uniform(0, 2*np.pi, size=((dim**2) - 1))
         result = minimize(

@@ -2,9 +2,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import ast
-from pathlib import Path
 
-plt.rcParams.update({'font.size': 12, 'lines.linewidth': 2, 'axes.grid': True})
+from pathlib import Path
+from colorspacious import cspace_convert
+
+plt.rcParams.update({'font.size': 12, 'lines.linewidth': 2, 'axes.grid': False})
 
 
 def load_latest_file(directory, pattern="*.csv"):
@@ -28,7 +30,7 @@ def plot_qsd_results(dim, overlap):
     df_theory = pd.read_csv(theory_path)
     df_sim = pd.read_csv(sim_path)
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(8, 6))
 
     plt.plot(df_theory['fixed rate'], df_theory['success rate'], label='SDP Bound (Theory)', color='dodgerblue', linestyle='-')
     plt.plot(df_theory['fixed rate'], df_theory['error rate'], label='SDP Bound (Theory)', color='firebrick', linestyle='-')
@@ -52,16 +54,37 @@ def plot_qsd_results(dim, overlap):
         col_name = df_hist.columns[0]
 
         trajectory = df_hist[col_name].dropna().apply(ast.literal_eval).tolist()
-        trajectory = np.array(trajectory)
+        selected_fixed_rate = trajectory[0]
+        trajectory = np.array(trajectory[1:])
 
-        plt.figure(figsize=(10, 6))
-        for i in range(trajectory.shape[1]):
-            plt.plot(trajectory[:, i], label=f'Param {i + 1}')
+        fig, ax1 = plt.subplots(figsize=(7, 6))
+        num_params = trajectory.shape[1] - 1
+        dim = np.sqrt(num_params + 1).astype(int)
+        colors = [cspace_convert([70, 60, 360*(theta/num_params)], "CIELCh", "sRGB1") for theta in range(num_params)]
+        colors = np.clip(colors, 0, 1)
+
+        lines = []
+        for i in range(int(dim*(dim-1)/2)):
+            line = ax1.plot(trajectory[:, i], label=rf'$\theta_{i + 1}$', color=colors[i], linewidth=1)
+            lines += line
+
+        for i in range(int(dim*(dim-1)/2), (dim**2)-1):
+            line = ax1.plot(trajectory[:, i], label=rf'$\varphi_{i - int(dim*(dim-1)/2) + 1}$', color=colors[i], linewidth=1)
+            lines += line
+        ax1.set_xlabel('Optimization Iterations')
+        ax1.set_ylabel('Parameter Value (rad)', color='k')
+
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('Lagrangian Value', color='k')
+        ax2.tick_params(axis='y', labelcolor='k')
+        line_lag = ax2.plot(trajectory[:, -1], label=r'$\mathcal{L}$', color='firebrick', linewidth=1.5)
+        lines += line_lag
+        labels = [l.get_label() for l in lines]
+        ax1.legend(lines, labels, bbox_to_anchor=(1.2, 1), loc='upper left')
 
         plt.xlabel('Optimization Iterations')
         plt.ylabel('Parameter Value (rad)')
-        plt.title(f'Trajectory of Best Trial ({col_name})')
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.title(f'Trajectory of Best Trial (@ fixed rate = {selected_fixed_rate})')
         plt.tight_layout()
         plt.show()
 
