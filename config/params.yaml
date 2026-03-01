@@ -1,0 +1,35 @@
+
+optimization:
+  method: "COBYLA"
+  tol: 1.0e-7
+  maxiter: 1e3
+  rhobeg: np.pi/2
+
+simulation:
+  q_points: 100
+  lambda_val: 3
+
+flags:
+  save_data: true
+  use_dummy_slm: false
+
+columns:
+  theory:
+    - overlap
+    - fixed rate
+    - success rate
+    - error rate
+    - failure rate
+  raw data:
+    - overlap
+    - trial
+    - fixed rate
+    - success rate
+    - error rate
+    - failure rate
+  raw parameter:
+    - best parameter
+    - worst parameter
+  optimal measurements:
+    - overlap
+    - fixed rate
