@@ -126,6 +126,10 @@ class Experiment:
                 coincidence_data -= A_channel_counts * B_channel_counts * cw * 1e-12
                 temp_rate[state_idx][vector_idx] += prior_prob_list[state_idx]*state[vector_idx]
 
+        total_counts = np.sum(temp_rate)
+        if total_counts > 0:
+            temp_rate /= total_counts
+
         success = np.trace(temp_rate)
         fail = np.sum(temp_rate[:, -1])
 
