@@ -8,6 +8,7 @@ from tqdm import trange
 from scipy.optimize import minimize
 
 from src.utils.quantum_states import *
+from src.utils.messenger import *
 from src.theory.discriminator import *
 
 
@@ -52,6 +53,7 @@ theory_df.to_csv(theory_filepath, index=False)
 # endregion
 
 
+start = time.time()
 # region simulation data
 sim_df = pd.DataFrame(columns=columns['sim data'])
 sim_history_df = pd.DataFrame([])
@@ -95,7 +97,7 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
             optimal_measurements[f"M{np.mod(vector_idx + 1, dim)}"] = vector
 
         P_success, P_error, P_fail = get_discrimination_rates(rho_list, optimal_measurements, prior_probability)
-        new_row = [overlap, trial, fixed_rate, P_success, P_error, P_fail, lagrangian, lambda_val, opt_config['method'], opt_config['options']['maxiter']]
+        new_row = [overlap, trial, fixed_rate, P_success, P_error, P_fail, lagrangian, lambda_val, opt_config['method'], result.nfev]
         sim_df = pd.concat([sim_df, pd.DataFrame([new_row], columns=columns['sim data'])], ignore_index=True)
 
         if lagrangian > best_lagrangians[fr_idx]:
@@ -108,3 +110,13 @@ sim_history_df.columns = pd.MultiIndex.from_product([["fixed rate"], sim_history
 sim_df.to_csv(sim_filepath, index=False)
 sim_history_df.to_csv(sim_history_filepath, index=False)
 # endregion
+
+best_idx = sim_df['lagrangian'].idxmax()
+best_fixed_rate = sim_df.loc[best_idx, 'fixed rate']
+max_P_succ = sim_df.loc[best_idx, 'success rate']
+theory_P_succ = theory_df.iloc[(theory_df['fixed rate'] - best_fixed_rate).abs().argsort()[:1]]['success rate'].values[0]
+avg_lag = sim_df['lagrangian'].mean()
+elapsed_time_raw = time.time() - start
+minutes, seconds = divmod(int(elapsed_time_raw), 60)
+time_str = f"{minutes}m {seconds}s"
+send_message(dim, overlap, opt_config['method'], minimize_params['lambda_val'], max_P_succ, theory_P_succ, avg_lag, time_str, minimize_params['trial'], sim_filename)
