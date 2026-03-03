@@ -7,13 +7,6 @@ optimization:
       rhobeg: 1.570796
       maxiter: 1000
       disp: false
-  L-BFGS-B:
-    method: "L-BFGS-B"
-    tol: 1.0e-7
-    options:
-      maxiter: 1000
-      ftol: 1.0e-8
-      disp: false
   Nelder-Mead:
     method: "Nelder-Mead"
     tol: 1.0e-7
@@ -21,6 +14,13 @@ optimization:
       maxiter: 1000
       xatol: 1.0e-4
       fatol: 1.0e-4
+      disp: false
+  L-BFGS-B:
+    method: "L-BFGS-B"
+    tol: 1.0e-7
+    options:
+      maxiter: 1000
+      ftol: 1.0e-8
       disp: false
   Powell:
     method: "Powell"
@@ -34,8 +34,8 @@ simulation:
   q_points: 100
 
 minimize:
-  trial: 2
-  q_points: 2
+  trial: 10
+  q_points: 10
   lambda_val: 1
 
 flags:

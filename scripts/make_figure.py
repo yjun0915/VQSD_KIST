@@ -50,7 +50,7 @@ def plot_qsd_results(dim, overlap):
     if history_path:
         df_hist = pd.read_csv(history_path)
 
-        col_name = df_hist.columns[9]
+        col_name = df_hist.columns[2]
 
         trajectory = df_hist[col_name].dropna().apply(ast.literal_eval).tolist()
         selected_fixed_rate = trajectory[0]
@@ -87,4 +87,4 @@ def plot_qsd_results(dim, overlap):
 
 
 if __name__ == "__main__":
-    plot_qsd_results(dim=3, overlap=0.75)
+    plot_qsd_results(dim=4, overlap=0.7459838989927388)

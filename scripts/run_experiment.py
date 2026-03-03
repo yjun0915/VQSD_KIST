@@ -31,18 +31,57 @@ minimize_params = config['minimize']
 columns = config['columns']
 # endregion
 
-# region toy example
-s_parameter = 0.75
-prior_probability = [0.5, 0.5, 0]
-prepared_state_set = np.array([
-    [np.sqrt((1+s_parameter)/2), np.sqrt((1-s_parameter)/2), 0],
-    [np.sqrt((1+s_parameter)/2), -np.sqrt((1-s_parameter)/2), 0]
-])
-overlap = s_parameter
-rho_list = get_rho_list(prepared_state_set)
-dim = len(prior_probability)
+
+activate = {
+    'toy_example_1': True,
+    'toy_example_2': False,
+    'toy_example_3': False
+}
+
+# region toy example 1
+if activate['toy_example_1']:
+    s_parameter = 0.75
+    prior_probability = [0.5, 0.5, 0]
+    prepared_state_set = np.array([
+        [np.sqrt((1+s_parameter)/2), np.sqrt((1-s_parameter)/2), 0],
+        [np.sqrt((1+s_parameter)/2), -np.sqrt((1-s_parameter)/2), 0]
+    ])
+    overlap = s_parameter
 # endregion
 
+# region toy example 2
+elif activate['toy_example_2']:
+    s_parameter = 0.75
+    prior_probability = [0.5, 0.5, 0, 0]
+    prepared_state_set = np.array([
+        [np.sqrt((1+s_parameter)/2), np.sqrt((1-s_parameter)/2), 0, 0],
+        [np.sqrt((1+s_parameter)/2), -np.sqrt((1-s_parameter)/2), 0, 0],
+        [0, 0, 0, 0]
+    ])
+    overlap = s_parameter
+# endregion
+
+# region toy example 3
+elif activate['toy_example_3']:
+    theta = 2 * np.pi / 3
+    varphi = 2 * np.pi / 3
+    xi = np.pi * 0.365
+
+    prior_probability = [1/3, 1/3, 1/3, 0]
+    prepared_state_set = np.array([
+        [np.cos(xi), 0, np.sin(xi), 0],
+        [np.cos(xi) * np.cos(theta), np.cos(xi) * np.sin(theta), np.sin(xi), 0],
+        [np.cos(xi) * np.cos(varphi), -np.cos(xi) * np.sin(varphi), np.sin(xi), 0]
+    ])
+    overlap = -0.5*(np.cos(xi)**2) + (np.sin(xi)**2)
+# endregion
+
+else:
+    print("no example was selected")
+    quit()
+
+rho_list = get_rho_list(prepared_state_set)
+dim = len(prior_probability)
 
 # region theory data
 theory_df = pd.DataFrame(columns=columns['theory'])
@@ -89,7 +128,7 @@ with timetagger_session(500, 50, 2, [29443, 0]) as timetagger:
 
                 def tracking_objective(x, *args):
                     current_lagrangian = experiment.cobyla_objective(x, *args)
-                    parameter_history.append(x.copy().tolist() + [-current_lagrangian])
+                    parameter_history.append(x.copy().tolist() + [float(-current_lagrangian)])
                     return current_lagrangian
 
 
