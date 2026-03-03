@@ -34,8 +34,8 @@ simulation:
   q_points: 100
 
 minimize:
-  trial: 10
-  q_points: 10
+  trial: 2
+  q_points: 2
   lambda_val: 1
 
 flags:

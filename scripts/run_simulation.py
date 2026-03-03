@@ -81,7 +81,7 @@ dim = len(prior_probability)
 theory_df = pd.DataFrame(columns=columns['theory'])
 theory_dir = Path(f"../data/theory/dim_{dim}")
 theory_dir.mkdir(parents=True, exist_ok=True)
-theory_filename = f"ov{overlap}.csv"
+theory_filename = f"ov{overlap:.2f}.csv"
 theory_filepath = theory_dir / theory_filename
 for fixed_rate in np.linspace(0, 1, 100):
     optimal_measurements = solve_sdp_bound(prepared_state_set, prior_probability, dim, fixed_rate)
@@ -101,8 +101,8 @@ current_time = datetime.now().strftime("%y%m%d_%H%M")
 sim_dir = Path(f"../data/simulation/dim_{dim}")
 sim_dir.mkdir(parents=True, exist_ok=True)
 
-sim_filename = f"{current_time}_ov{overlap}.csv"
-sim_history_filename = f"{current_time}_ov{overlap}_history.csv"
+sim_filename = f"{current_time}_ov{overlap:.2f}.csv"
+sim_history_filename = f"{current_time}_ov{overlap:.2f}_history.csv"
 
 sim_filepath = sim_dir / sim_filename
 sim_history_filepath = sim_dir / sim_history_filename

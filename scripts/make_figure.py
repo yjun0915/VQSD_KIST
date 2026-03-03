@@ -87,4 +87,4 @@ def plot_qsd_results(dim, overlap):
 
 
 if __name__ == "__main__":
-    plot_qsd_results(dim=4, overlap=0.7459838989927388)
+    plot_qsd_results(dim=4, overlap=0.75)
