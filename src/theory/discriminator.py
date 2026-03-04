@@ -1,4 +1,5 @@
 import time
+import yaml
 
 import numpy as np
 import cvxpy as cp
@@ -66,9 +67,9 @@ class Experiment:
         self.slm_measure = slm[1]
         self.state_list = state_list
         self.dim = dim
-        self.res = [1920, 1080]
-        self.pixel_pitch = 8e-6
-        self.w0 = 8e-4
+        with open("../config/params.yaml", "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+        self.slm_config = config['devices']['slm']
 
         spacing = 2
         pos = np.arange(int(np.ceil(spacing / 2)), int(np.ceil(spacing / 2)) + (dim // 2) * spacing, spacing)
@@ -78,17 +79,13 @@ class Experiment:
         self.state_holograms = {}
         for state in state_list:
             fields = generate_oam_superposition(
-                res=self.res,
-                pixel_pitch=self.pixel_pitch,
-                beam_w0=self.w0,
+                *self.slm_config,
                 l_modes=self.l_modes,
                 p_modes=self.p_modes,
                 weights=state,
                 prepare=True,
                 measure=False
             )
-            # encode_hologram(*fields, pixel_pitch=pixel_pitch, d=8, N_steps=8, M=1, prepare=True, measure=False,
-            #                 save=True, path="temporal_images", name=str(state))
             self.state_holograms[str(state)] = encode_hologram(*fields, pixel_pitch=self.pixel_pitch, d=8, N_steps=8,
                                                                M=1, prepare=True, measure=False, save=False)
 
@@ -104,9 +101,7 @@ class Experiment:
             self.slm_prepare.imshow(self.state_holograms[str(state)])
             for vector_idx, vector in enumerate(vector_list):
                 fields = generate_oam_superposition(
-                    res=self.res,
-                    pixel_pitch=self.pixel_pitch,
-                    beam_w0=self.w0,
+                    *self.slm_config,
                     l_modes=self.l_modes,
                     p_modes=self.p_modes,
                     weights=vector.conj(),
@@ -123,8 +118,8 @@ class Experiment:
                 A_channel_counts = np.sum(a=count_data, axis=1)[0]
                 B_channel_counts = np.sum(a=count_data, axis=1)[1]
                 coincidence_data = np.sum(a=count_data, axis=1)[2]
-                coincidence_data -= A_channel_counts * B_channel_counts * cw * 1e-12
-                temp_rate[state_idx][vector_idx] += prior_prob_list[state_idx]*state[vector_idx]
+                coincidence_data -= max(0, A_channel_counts * B_channel_counts * cw * 1e-12)
+                temp_rate[state_idx][vector_idx] += prior_prob_list[state_idx]*coincidence_data
 
         total_counts = np.sum(temp_rate)
         if total_counts > 0:

@@ -100,14 +100,3 @@ def prepared_state_d_dim(dim, overlap):
             output_vectors[d, 2 + m] = output_vectors[d, 1 + m] * np.sin(result.x[(d * (dim - 1)) + 1 + m])
             output_vectors[d, 1 + m] = output_vectors[d, 1 + m] * np.cos(result.x[(d * (dim - 1)) + 1 + m])
     return output_vectors
-
-dim = 8
-vectors = prepared_state_d_dim(dim, 0.5)
-
-gram_matrix = np.empty(shape=(dim, dim))
-for row, vector_row in enumerate(vectors):
-    for col, vector_col in enumerate(vectors):
-        gram_matrix[row, col] = np.vdot(vector_col, vector_row)
-
-print(vectors)
-print(gram_matrix)

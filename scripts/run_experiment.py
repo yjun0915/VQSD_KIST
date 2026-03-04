@@ -16,8 +16,6 @@ from src.hardware.tcspc_core import *
 from src.hardware.slm_core import *
 
 
-cw = 500
-
 # region parameter configuration
 with open("../config/params.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
@@ -118,7 +116,8 @@ fixed_rates = np.linspace(0, overlap, q_points)
 best_lagrangians = np.full(q_points, -np.inf)
 best_histories = [[] for _ in range(q_points)]
 
-with timetagger_session(500, 50, 2, [29443, 0]) as timetagger:
+with timetagger_session(config['devices']['timetagger']) as timetagger:
+    cw = config['devices']['timetagger'][0]
     with slm_session() as slm:
         experiment = Experiment(timetagger, slm, prepared_state_set, dim)
         for trial in trange(minimize_params['trial'], desc="Trials"):
@@ -166,8 +165,8 @@ with timetagger_session(500, 50, 2, [29443, 0]) as timetagger:
                         A_channel_counts = np.sum(a=count_data, axis=1)[0]
                         B_channel_counts = np.sum(a=count_data, axis=1)[1]
                         coincidence_data = np.sum(a=count_data, axis=1)[2]
-                        coincidence_data -= A_channel_counts * B_channel_counts * cw * 1e-12
-                        temp_rate[state_idx][vector_idx] += prior_probability[state_idx] * state[vector_idx]
+                        coincidence_data -= max(0, A_channel_counts * B_channel_counts * cw * 1e-12)
+                        temp_rate[state_idx][vector_idx] += prior_probability[state_idx] * coincidence_data
 
                 P_success = np.trace(temp_rate)
                 P_fail = np.sum(temp_rate[:, -1])
@@ -186,13 +185,14 @@ sim_history_df.columns = pd.MultiIndex.from_product([["fixed rate"], sim_history
 raw_df.to_csv(raw_filepath, index=False)
 sim_history_df.to_csv(raw_history_filepath, index=False)
 # endregion
+end = time.time()
+elapsed_time_raw = end - start
+minutes, seconds = divmod(int(elapsed_time_raw), 60)
+time_str = f"{minutes}m {seconds}s"
 
 best_idx = raw_df['lagrangian'].idxmax()
 best_fixed_rate = raw_df.loc[best_idx, 'fixed rate']
 max_P_succ = raw_df.loc[best_idx, 'success rate']
 theory_P_succ = theory_df.iloc[(theory_df['fixed rate'] - best_fixed_rate).abs().argsort()[:1]]['success rate'].values[0]
 avg_lag = raw_df['lagrangian'].mean()
-elapsed_time_raw = time.time() - start
-minutes, seconds = divmod(int(elapsed_time_raw), 60)
-time_str = f"{minutes}m {seconds}s"
 send_message(dim, overlap, opt_config['method'], minimize_params['lambda_val'], max_P_succ, theory_P_succ, avg_lag, time_str, minimize_params['trial'], raw_filename)

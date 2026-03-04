@@ -71,3 +71,14 @@ columns:
     - lambda
     - method
     - maxiter
+
+devices:
+  slm:
+    - [1920, 1080]
+    - 8e-6
+    - 8e-4
+  timetagger:
+    - 500
+    - 50
+    - 2
+    - [29443, 0]
