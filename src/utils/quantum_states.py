@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import minimize
 
 
 def get_rho_list(states):
@@ -18,7 +19,7 @@ def unitary_matrix(params, n):
     """
     theta = params[0:int(n*(n-1)/2)]
     phi = params[int(n*(n-1)/2):(n*(n-1))]
-    d_params = [1] + list(params[(n*(n-1)):((n**2)-1)])
+    d_params = [0] + list(params[(n*(n-1)):((n**2)-1)])
 
     t_matrix = np.eye(n, dtype=complex)
     d_matrix = np.eye(n, dtype=complex)
@@ -61,3 +62,52 @@ def get_discrimination_rates(state, measure, prior_probability):
             else:
                 P_error += prob * np.real(np.trace(rho @ M))
     return P_success, P_error, P_fail
+
+
+def prepared_state_d_dim(dim, overlap):
+    if dim < 2:
+        return None
+
+    target_gram_matrix = np.empty(shape=(dim, dim))
+    target_gram_matrix.fill(overlap)
+    for idx in range(dim): target_gram_matrix[idx, idx] = 1
+
+    def obj(x):
+        vectors = np.empty(shape=(dim, dim))
+        for d in range(dim):
+            vectors[d, 0] = np.cos(x[d*(dim-1)])
+            vectors[d, 1] = np.sin(x[d*(dim-1)])
+        for m in range(dim-2):
+            for d in range(dim):
+                vectors[d, 2+m] = vectors[d, 1+m]*np.sin(x[(d * (dim - 1)) + 1 + m])
+                vectors[d, 1+m] = vectors[d, 1+m]*np.cos(x[(d * (dim - 1)) + 1 + m])
+
+        gram_matrix = np.empty(shape=(dim, dim))
+        for row, vector_row in enumerate(vectors):
+            for col, vector_col in enumerate(vectors):
+                gram_matrix[row, col] = np.vdot(vector_col, vector_row)
+
+        return np.trace(np.dot((target_gram_matrix-gram_matrix).T, (target_gram_matrix-gram_matrix)))
+    init = np.random.uniform(0, 2*np.pi, size=(dim*(dim-1)))
+    result = minimize(obj, init, method='COBYLA', tol=1e-7, options={'maxiter': 10000, 'rhobeg':1.570796})
+
+    output_vectors = np.empty(shape=(dim, dim))
+    for d in range(dim):
+        output_vectors[d, 0] = np.cos(result.x[d * (dim - 1)])
+        output_vectors[d, 1] = np.sin(result.x[d * (dim - 1)])
+    for m in range(dim - 2):
+        for d in range(dim):
+            output_vectors[d, 2 + m] = output_vectors[d, 1 + m] * np.sin(result.x[(d * (dim - 1)) + 1 + m])
+            output_vectors[d, 1 + m] = output_vectors[d, 1 + m] * np.cos(result.x[(d * (dim - 1)) + 1 + m])
+    return output_vectors
+
+dim = 8
+vectors = prepared_state_d_dim(dim, 0.5)
+
+gram_matrix = np.empty(shape=(dim, dim))
+for row, vector_row in enumerate(vectors):
+    for col, vector_col in enumerate(vectors):
+        gram_matrix[row, col] = np.vdot(vector_col, vector_row)
+
+print(vectors)
+print(gram_matrix)
