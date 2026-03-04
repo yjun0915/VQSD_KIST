@@ -16,7 +16,7 @@ from src.theory.discriminator import *
 with open("../config/params.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
-opt_config = config['optimization']['Nelder-Mead']
+opt_config = config['optimization'][config['minimize']['optimizer']]
 
 lambda_val = config['minimize']['lambda_val']
 
@@ -26,11 +26,7 @@ columns = config['columns']
 # endregion
 
 
-activate = {
-    'toy_example_1': False,
-    'toy_example_2': False,
-    'toy_example_3': True
-}
+activate = config['flags']['activate']
 
 # region toy example 1
 if activate['toy_example_1']:

@@ -1,0 +1,12 @@
+
+settings:
+  1:
+  - 'toy_example_1'
+  - 'COBYLA'
+  - 0.001
+  - 1
+  2:
+  - 'toy_example_3'
+  - 'COBYLA'
+  - 0.001
+  - 1

@@ -43,7 +43,7 @@ flags:
   activate:
     toy_example_1: false
     toy_example_2: false
-    toy_example_3: true
+    toy_example_3: false
   save_data: true
   use_dummy_slm: false
 minimize:
@@ -58,7 +58,7 @@ optimization:
       disp: false
       maxiter: 1000
       rhobeg: 1.570796
-    tol: 0.001
+    tol: 1.0e-07
   L-BFGS-B:
     method: L-BFGS-B
     options:
