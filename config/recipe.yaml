@@ -3,179 +3,251 @@ settings:
   lambda_val: 1
   optimizer: COBYLA
   overlap: 0.25
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: COBYLA
   overlap: 0.25
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: COBYLA
   overlap: 0.25
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: COBYLA
   overlap: 0.5
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: COBYLA
   overlap: 0.5
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: COBYLA
   overlap: 0.5
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: COBYLA
   overlap: 0.75
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: COBYLA
   overlap: 0.75
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: COBYLA
   overlap: 0.75
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: COBYLA
   overlap: 0.25
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: COBYLA
   overlap: 0.25
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: COBYLA
   overlap: 0.25
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: COBYLA
   overlap: 0.5
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: COBYLA
   overlap: 0.5
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: COBYLA
   overlap: 0.5
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: COBYLA
   overlap: 0.75
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: COBYLA
   overlap: 0.75
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: COBYLA
   overlap: 0.75
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: Nelder-Mead
   overlap: 0.25
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: Nelder-Mead
   overlap: 0.25
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: Nelder-Mead
   overlap: 0.25
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: Nelder-Mead
   overlap: 0.5
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: Nelder-Mead
   overlap: 0.5
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: Nelder-Mead
   overlap: 0.5
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: Nelder-Mead
   overlap: 0.75
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: Nelder-Mead
   overlap: 0.75
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: Nelder-Mead
   overlap: 0.75
+  q_points: 2
   tol: 0.01
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: Nelder-Mead
   overlap: 0.25
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: Nelder-Mead
   overlap: 0.25
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: Nelder-Mead
   overlap: 0.25
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: Nelder-Mead
   overlap: 0.5
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: Nelder-Mead
   overlap: 0.5
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: Nelder-Mead
   overlap: 0.5
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 3
   lambda_val: 1
   optimizer: Nelder-Mead
   overlap: 0.75
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 4
   lambda_val: 0.87
   optimizer: Nelder-Mead
   overlap: 0.75
+  q_points: 2
   tol: 0.001
+  trial: 1
 - dim: 5
   lambda_val: 0.8
   optimizer: Nelder-Mead
   overlap: 0.75
+  q_points: 2
   tol: 0.001
+  trial: 1

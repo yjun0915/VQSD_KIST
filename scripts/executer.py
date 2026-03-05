@@ -27,6 +27,10 @@ for current_settings in settings:
 
     config['minimize']['overlap'] = current_settings['overlap']
 
+    config['minimize']['q_points'] = current_settings['q_points']
+
+    config['minimize']['trial'] = current_settings['trial']
+
     with open('../config/params.yaml', 'w') as f:
         yaml.dump(config, f)
 

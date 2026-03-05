@@ -104,13 +104,14 @@ sim_history_df.columns = pd.MultiIndex.from_product([["fixed rate"], sim_history
 sim_df.to_csv(sim_filepath, index=False)
 sim_history_df.to_csv(sim_history_filepath, index=False)
 # endregion
+end = time.time()
+elapsed_time_raw = end - start
+minutes, seconds = divmod(elapsed_time_raw, 60)
+time_str = f"{int(minutes)}m {seconds:.2f}s"
 
 best_idx = sim_df['lagrangian'].idxmax()
 best_fixed_rate = sim_df.loc[best_idx, 'fixed rate']
 max_P_succ = sim_df.loc[best_idx, 'success rate']
 theory_P_succ = theory_df.iloc[(theory_df['fixed rate'] - best_fixed_rate).abs().argsort()[:1]]['success rate'].values[0]
 avg_lag = sim_df['lagrangian'].mean()
-elapsed_time_raw = time.time() - start
-minutes, seconds = divmod((elapsed_time_raw), 60)
-time_str = f"{int(minutes)}m {seconds:.2f}s"
 send_message(dim, overlap, opt_config['method'], minimize_params['lambda_val'], max_P_succ, theory_P_succ, avg_lag, time_str, minimize_params['trial'], sim_filename)

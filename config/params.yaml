@@ -43,12 +43,12 @@ flags:
   save_data: true
   use_dummy_slm: false
 minimize:
-  dim: 5
-  lambda_val: 0.8
-  optimizer: Nelder-Mead
-  overlap: 0.75
-  q_points: 10
-  trial: 100
+  dim: 4
+  lambda_val: 0.87
+  optimizer: COBYLA
+  overlap: 0.25
+  q_points: 2
+  trial: 1
 optimization:
   COBYLA:
     method: COBYLA
@@ -56,7 +56,7 @@ optimization:
       disp: false
       maxiter: 10000
       rhobeg: 1.570796
-    tol: 0.001
+    tol: 0.01
   L-BFGS-B:
     method: L-BFGS-B
     options:
