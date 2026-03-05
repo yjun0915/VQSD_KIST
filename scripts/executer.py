@@ -15,7 +15,7 @@ with open("../config/recipe.yaml", "r", encoding="utf-8") as f:
 with open("../config/params.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
-for current_settings, in settings:
+for current_settings in settings:
     print(current_settings)
     config['minimize']['dim'] = current_settings['dim']
 
@@ -23,7 +23,7 @@ for current_settings, in settings:
 
     config['optimization'][current_settings['optimizer']]['tol'] = current_settings['tol']
 
-    config['minimize']['lambda_val'] = current_settings['lambda val']
+    config['minimize']['lambda_val'] = current_settings['lambda_val']
 
     config['minimize']['overlap'] = current_settings['overlap']
 
