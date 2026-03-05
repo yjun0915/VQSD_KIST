@@ -1,4 +1,5 @@
 import sys
+import time
 import yaml
 import subprocess
 
@@ -14,30 +15,34 @@ with open("../config/recipe.yaml", "r", encoding="utf-8") as f:
 with open("../config/params.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
-exp_nums = settings.keys()
+for current_settings, in settings:
+    print(current_settings)
+    config['minimize']['dim'] = current_settings['dim']
 
-for exp_num in exp_nums:
-    current_settings = settings[exp_num]
-    for _ in config['flags']['activate'].keys():
-        config['flags']['activate'][_] = False
-    config['flags']['activate'][current_settings[0]] = True
+    config['minimize']['optimizer'] = current_settings['optimizer']
 
-    config['minimize']['optimizer'] = current_settings[1]
+    config['optimization'][current_settings['optimizer']]['tol'] = current_settings['tol']
 
-    config['optimization'][current_settings[1]]['tol'] = current_settings[2]
+    config['minimize']['lambda_val'] = current_settings['lambda val']
 
-    config['minimize']['lambda_val'] = current_settings[3]
+    config['minimize']['overlap'] = current_settings['overlap']
 
     with open('../config/params.yaml', 'w') as f:
         yaml.dump(config, f)
+
+    start = time.time()
     result = subprocess.run(
         [sys.executable, str(target_script)],
         capture_output=True,
         text=True,
         encoding='utf-8'
     )
+
+    elapsed_time_raw = time.time() - start
+    minutes, seconds = divmod((elapsed_time_raw), 60)
+    time_str = f"{int(minutes)}m {seconds:.2f}s"
     if result.returncode == 0:
-        print("✅ 실험 완료!")
+        print(f"✅ 실험 완료, 총 시간 {time_str}")
     else:
         print("❌ 실험 중 에러 발생:")
         print(result.stderr)

@@ -40,23 +40,21 @@ devices:
   - - 29443
     - 0
 flags:
-  activate:
-    toy_example_1: false
-    toy_example_2: false
-    toy_example_3: true
   save_data: true
   use_dummy_slm: false
 minimize:
-  lambda_val: 1
-  optimizer: COBYLA
-  q_points: 2
-  trial: 2
+  dim: 5
+  lambda_val: 0.8
+  optimizer: Nelder-Mead
+  overlap: 0.75
+  q_points: 10
+  trial: 100
 optimization:
   COBYLA:
     method: COBYLA
     options:
       disp: false
-      maxiter: 1000
+      maxiter: 10000
       rhobeg: 1.570796
     tol: 0.001
   L-BFGS-B:
@@ -73,7 +71,7 @@ optimization:
       fatol: 0.0001
       maxiter: 1000
       xatol: 0.0001
-    tol: 1.0e-07
+    tol: 0.001
   Powell:
     method: Powell
     options:

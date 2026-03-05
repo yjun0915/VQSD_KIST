@@ -99,4 +99,4 @@ def prepared_state_d_dim(dim, overlap):
         for d in range(dim):
             output_vectors[d, 2 + m] = output_vectors[d, 1 + m] * np.sin(result.x[(d * (dim - 1)) + 1 + m])
             output_vectors[d, 1 + m] = output_vectors[d, 1 + m] * np.cos(result.x[(d * (dim - 1)) + 1 + m])
-    return output_vectors
+    return np.array(output_vectors)

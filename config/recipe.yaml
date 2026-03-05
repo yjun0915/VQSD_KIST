@@ -1,12 +1,271 @@
-
 settings:
-  1:
-  - 'toy_example_1'
-  - 'COBYLA'
-  - 0.001
-  - 1
-  2:
-  - 'toy_example_3'
-  - 'COBYLA'
-  - 0.001
-  - 1
+  - - dim: 3
+      overlap: 0.25
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 3
+      overlap: 0.25
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 3
+      overlap: 0.25
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 3
+      overlap: 0.5
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 3
+      overlap: 0.5
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 3
+      overlap: 0.5
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 3
+      overlap: 0.75
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 3
+      overlap: 0.75
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 3
+      overlap: 0.75
+      lambda val: 1
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 4
+      overlap: 0.25
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 4
+      overlap: 0.25
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 4
+      overlap: 0.25
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 4
+      overlap: 0.5
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 4
+      overlap: 0.5
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 4
+      overlap: 0.5
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 4
+      overlap: 0.75
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 4
+      overlap: 0.75
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 4
+      overlap: 0.75
+      lambda val: 0.87
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 5
+      overlap: 0.25
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 5
+      overlap: 0.25
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 5
+      overlap: 0.25
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 5
+      overlap: 0.5
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 5
+      overlap: 0.5
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 5
+      overlap: 0.5
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 5
+      overlap: 0.75
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.1
+  - - dim: 5
+      overlap: 0.75
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.01
+  - - dim: 5
+      overlap: 0.75
+      lambda val: 0.8
+      optimizer: COBYLA
+      tol: 0.001
+  - - dim: 3
+      overlap: 0.25
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 3
+      overlap: 0.25
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 3
+      overlap: 0.25
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 3
+      overlap: 0.5
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 3
+      overlap: 0.5
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 3
+      overlap: 0.5
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 3
+      overlap: 0.75
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 3
+      overlap: 0.75
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 3
+      overlap: 0.75
+      lambda val: 1
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 4
+      overlap: 0.25
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 4
+      overlap: 0.25
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 4
+      overlap: 0.25
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 4
+      overlap: 0.5
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 4
+      overlap: 0.5
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 4
+      overlap: 0.5
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 4
+      overlap: 0.75
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 4
+      overlap: 0.75
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 4
+      overlap: 0.75
+      lambda val: 0.87
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 5
+      overlap: 0.25
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 5
+      overlap: 0.25
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 5
+      overlap: 0.25
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 5
+      overlap: 0.5
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 5
+      overlap: 0.5
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 5
+      overlap: 0.5
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.001
+  - - dim: 5
+      overlap: 0.75
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.1
+  - - dim: 5
+      overlap: 0.75
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.01
+  - - dim: 5
+      overlap: 0.75
+      lambda val: 0.8
+      optimizer: Nelder-Mead
+      tol: 0.001

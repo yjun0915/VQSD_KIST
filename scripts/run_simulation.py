@@ -25,53 +25,12 @@ minimize_params = config['minimize']
 columns = config['columns']
 # endregion
 
-
-activate = config['flags']['activate']
-
-# region toy example 1
-if activate['toy_example_1']:
-    s_parameter = 0.75
-    prior_probability = [0.5, 0.5, 0]
-    prepared_state_set = np.array([
-        [np.sqrt((1+s_parameter)/2), np.sqrt((1-s_parameter)/2), 0],
-        [np.sqrt((1+s_parameter)/2), -np.sqrt((1-s_parameter)/2), 0]
-    ])
-    overlap = s_parameter
-# endregion
-
-# region toy example 2
-elif activate['toy_example_2']:
-    s_parameter = 0.75
-    prior_probability = [0.5, 0.5, 0, 0]
-    prepared_state_set = np.array([
-        [np.sqrt((1+s_parameter)/2), np.sqrt((1-s_parameter)/2), 0, 0],
-        [np.sqrt((1+s_parameter)/2), -np.sqrt((1-s_parameter)/2), 0, 0],
-        [0, 0, 0, 0]
-    ])
-    overlap = s_parameter
-# endregion
-
-# region toy example 3
-elif activate['toy_example_3']:
-    theta = 2 * np.pi / 3
-    varphi = 2 * np.pi / 3
-    xi = np.pi * 0.365
-
-    prior_probability = [1/3, 1/3, 1/3, 0]
-    prepared_state_set = np.array([
-        [np.cos(xi), 0, np.sin(xi), 0],
-        [np.cos(xi) * np.cos(theta), np.cos(xi) * np.sin(theta), np.sin(xi), 0],
-        [np.cos(xi) * np.cos(varphi), -np.cos(xi) * np.sin(varphi), np.sin(xi), 0]
-    ])
-    overlap = -0.5*(np.cos(xi)**2) + (np.sin(xi)**2)
-# endregion
-
-else:
-    print("no example was selected")
-    quit()
+dim = minimize_params['dim']
+overlap = minimize_params['overlap']
+prior_probability = [1/(dim-1) for _ in range(dim-1)] + [0]
+prepared_state_set = np.hstack((prepared_state_d_dim(dim-1, overlap), [[0] for _ in range(dim-1)]))
 
 rho_list = get_rho_list(prepared_state_set)
-dim = len(prior_probability)
 
 # region theory data
 theory_df = pd.DataFrame(columns=columns['theory'])
@@ -93,7 +52,7 @@ start = time.time()
 sim_df = pd.DataFrame(columns=columns['sim data'])
 sim_history_df = pd.DataFrame([])
 
-current_time = datetime.now().strftime("%y%m%d_%H%M")
+current_time = datetime.now().strftime("%y%m%d_%H%M%S")
 sim_dir = Path(f"../data/simulation/dim_{dim}")
 sim_dir.mkdir(parents=True, exist_ok=True)
 
@@ -152,6 +111,6 @@ max_P_succ = sim_df.loc[best_idx, 'success rate']
 theory_P_succ = theory_df.iloc[(theory_df['fixed rate'] - best_fixed_rate).abs().argsort()[:1]]['success rate'].values[0]
 avg_lag = sim_df['lagrangian'].mean()
 elapsed_time_raw = time.time() - start
-minutes, seconds = divmod(int(elapsed_time_raw), 60)
-time_str = f"{minutes}m {seconds}s"
+minutes, seconds = divmod((elapsed_time_raw), 60)
+time_str = f"{int(minutes)}m {seconds:.2f}s"
 send_message(dim, overlap, opt_config['method'], minimize_params['lambda_val'], max_P_succ, theory_P_succ, avg_lag, time_str, minimize_params['trial'], sim_filename)

@@ -45,7 +45,7 @@ def plot_qsd_results(dim, overlap):
     ax0.set_xlabel('Fixed Rate (Error or Failure Constraint)')
     ax0.set_ylabel('Success Probability')
     ax0.set_title(f'Quantum State Discrimination (Dim={dim}, Overlap={overlap})')
-    ax0.legend()
+    # ax0.legend()
 
     if history_path:
         df_hist = pd.read_csv(history_path)
@@ -77,7 +77,7 @@ def plot_qsd_results(dim, overlap):
         line_lag = ax2.plot(trajectory[:, -1], label=r'$\mathcal{L}$', color='firebrick', linewidth=1.5)
         lines += line_lag
         labels = [l.get_label() for l in lines]
-        ax2.legend(lines, labels, bbox_to_anchor=(0.65, 1), loc='upper left', framealpha=0.7)
+        # ax2.legend(lines, labels, bbox_to_anchor=(0.65, 1), loc='upper left', framealpha=0.7)
 
         ax1.set_xlabel('Optimization Iterations')
         ax1.set_ylabel('Parameter Value (rad)')
