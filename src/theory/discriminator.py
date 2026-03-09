@@ -72,9 +72,14 @@ class Experiment:
         self.slm_config = config['devices']['slm']
 
         spacing = 2
-        pos = np.arange(int(np.ceil(spacing / 2)), int(np.ceil(spacing / 2)) + (dim // 2) * spacing, spacing)
-        self.l_modes = np.concatenate([-pos[::-1], pos]).tolist()
-        self.p_modes = np.zeros_like(self.l_modes)
+        self.l_modes = [-1]
+        for d in np.arange(2, dim+1):
+            if (d ^ 1) & 1:
+                self.l_modes = self.l_modes + [int(d/2)*spacing - 1]
+            elif d & 1:
+                self.l_modes = [-(int((d-1)/2)*spacing + 1)] + self.l_modes
+
+        self.p_modes = np.zeros_like(self.l_modes).tolist()
 
         self.state_holograms = {}
         for state in state_list:
