@@ -46,9 +46,9 @@ minimize:
   dim: 4
   lambda_val: 0.87
   optimizer: COBYLA
-  overlap: 0.25
-  q_points: 2
-  trial: 1
+  overlap: 0.5
+  q_points: 10
+  trial: 100
 optimization:
   COBYLA:
     method: COBYLA
