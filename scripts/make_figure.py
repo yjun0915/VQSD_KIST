@@ -17,7 +17,7 @@ def load_latest_file(directory, pattern="*.csv"):
 
 
 def plot_qsd_results(dim, overlap):
-    sim_dir = Path(f"../data/simulation/dim_{dim}")
+    sim_dir = Path(f"../data/experiment/dim_{dim}")
     theory_path = Path(f"../data/theory/dim_{dim}/ov{overlap}.csv")
 
     sim_path = load_latest_file(sim_dir, f"*_ov{overlap}.csv")
@@ -29,6 +29,10 @@ def plot_qsd_results(dim, overlap):
 
     df_theory = pd.read_csv(theory_path)
     df_sim = pd.read_csv(sim_path)
+
+    cols = ['success rate', 'error rate', 'failure rate']
+    row_sums = df_sim[cols].sum(axis=1)
+    df_sim[cols] = df_sim[cols].div(row_sums, axis=0)
 
     fig, (ax1, ax0) = plt.subplots(1, 2, figsize=(10.46, 6), gridspec_kw={'width_ratios': [1, 1.81]})
 
