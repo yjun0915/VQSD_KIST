@@ -8,8 +8,6 @@ from ..utils.quantum_states import *
 from OAM_KIST.holography import *
 
 
-cw = 500
-
 def solve_sdp_bound(prepared_state_set, prior_probability, dim, fixed_rate):
     """
     CVXPY를 사용하여 QSD(Quantum State Discrimination)의 이론적 확률 상한(SDP Bound)을 계산
@@ -70,6 +68,7 @@ class Experiment:
         with open("../config/params.yaml", "r", encoding="utf-8") as f:
             config = yaml.safe_load(f)
         self.slm_config = config['devices']['slm']
+        self.cw = config['devices']['timetagger']['cw']
 
         spacing = 2
         self.l_modes = [-1]
@@ -84,15 +83,16 @@ class Experiment:
         self.state_holograms = {}
         for state in state_list:
             fields = generate_oam_superposition(
-                *self.slm_config,
+                res=self.slm_config['res'],
+                pixel_pitch=self.slm_config['pixel_pitch'],
+                beam_w0=self.slm_config['beam_w0'],
                 l_modes=self.l_modes,
                 p_modes=self.p_modes,
                 weights=state,
                 prepare=True,
                 measure=False
             )
-            self.state_holograms[str(state)] = encode_hologram(*fields, pixel_pitch=self.pixel_pitch, d=8, N_steps=8,
-                                                               M=1, prepare=True, measure=False, save=False)
+            self.state_holograms[str(state)] = encode_hologram(*fields, pixel_pitch=self.slm_config['pixel_pitch'], d=8, N_steps=8, M=1, prepare=True, measure=False, save=False)
 
 
     def cobyla_objective(self, x, prior_prob_list, fixed_rate, _lambda):
@@ -106,15 +106,16 @@ class Experiment:
             self.slm_prepare.imshow(self.state_holograms[str(state)])
             for vector_idx, vector in enumerate(vector_list):
                 fields = generate_oam_superposition(
-                    *self.slm_config,
+                    res=self.slm_config['res'],
+                    pixel_pitch=self.slm_config['pixel_pitch'],
+                    beam_w0=self.slm_config['beam_w0'],
                     l_modes=self.l_modes,
                     p_modes=self.p_modes,
                     weights=vector.conj(),
                     prepare=True,
                     measure=False
                 )
-                projection_hologram = encode_hologram(*fields, pixel_pitch=self.pixel_pitch, d=8, N_steps=8, M=1,
-                                                      prepare=False, measure=True, save=False)
+                projection_hologram = encode_hologram(*fields, pixel_pitch=self.slm_config['pixel_pitch'], d=8, N_steps=8, M=1, prepare=False, measure=True, save=False)
                 self.slm_measure.imshow(projection_hologram)
 
                 time.sleep(0.2)
@@ -123,7 +124,7 @@ class Experiment:
                 A_channel_counts = np.sum(a=count_data, axis=1)[0]
                 B_channel_counts = np.sum(a=count_data, axis=1)[1]
                 coincidence_data = np.sum(a=count_data, axis=1)[2]
-                coincidence_data -= max(0, A_channel_counts * B_channel_counts * cw * 1e-12)
+                coincidence_data -= max(0, A_channel_counts * B_channel_counts * self.cw * 1e-12)
                 temp_rate[state_idx][vector_idx] += prior_prob_list[state_idx]*coincidence_data
 
         total_counts = np.sum(temp_rate)

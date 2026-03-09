@@ -29,26 +29,28 @@ columns:
   - failure rate
 devices:
   slm:
-  - - 1920
+    beam_w0: 0.0008
+    pixel_pitch: 8.0e-06
+    res:
+    - 1920
     - 1080
-  - 8e-6
-  - 8e-4
   timetagger:
-  - 500
-  - 50
-  - 2
-  - - 29443
+    binwidth: 50
+    cw: 50
+    delay:
+    - 29443
     - 0
+    n_value: 2
 flags:
   save_data: true
   use_dummy_slm: false
 minimize:
-  dim: 4
-  lambda_val: 0.87
-  optimizer: COBYLA
-  overlap: 0.5
-  q_points: 10
-  trial: 100
+  dim: 3
+  lambda_val: 1.0
+  optimizer: Nelder-Mead
+  overlap: 0.75
+  q_points: 1
+  trial: 1
 optimization:
   COBYLA:
     method: COBYLA
@@ -71,7 +73,7 @@ optimization:
       fatol: 0.0001
       maxiter: 1000
       xatol: 0.0001
-    tol: 0.001
+    tol: 0.01
   Powell:
     method: Powell
     options:

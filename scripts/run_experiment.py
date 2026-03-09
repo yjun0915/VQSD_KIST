@@ -71,8 +71,9 @@ fixed_rates = np.linspace(0, overlap, q_points)
 best_lagrangians = np.full(q_points, -np.inf)
 best_histories = [[] for _ in range(q_points)]
 
-with timetagger_session(config['devices']['timetagger']) as timetagger:
-    cw = config['devices']['timetagger'][0]
+timetagger_config = config['devices']['timetagger']
+with timetagger_session(timetagger_config['cw'], timetagger_config['binwidth'], timetagger_config['n_value'], timetagger_config['delay']) as timetagger:
+    cw = config['devices']['timetagger']['cw']
     with slm_session() as slm:
         experiment = Experiment(timetagger, slm, prepared_state_set, dim)
         for trial in trange(minimize_params['trial'], desc="Trials"):
@@ -102,16 +103,16 @@ with timetagger_session(config['devices']['timetagger']) as timetagger:
                     slm[0].imshow(experiment.state_holograms[str(state)])
                     for vector_idx, vector in enumerate(vector_list):
                         fields = generate_oam_superposition(
-                            res=experiment.res,
-                            pixel_pitch=experiment.pixel_pitch,
-                            beam_w0=experiment.w0,
+                            res=experiment.slm_config['res'],
+                            pixel_pitch=experiment.slm_config['pixel_pitch'],
+                            beam_w0=experiment.slm_config['beam_w0'],
                             l_modes=experiment.l_modes,
                             p_modes=experiment.p_modes,
                             weights=vector.conj(),
                             prepare=True,
                             measure=False
                         )
-                        projection_hologram = encode_hologram(*fields, pixel_pitch=experiment.pixel_pitch, d=8, N_steps=8,  M=1, prepare=False, measure=True, save=False)
+                        projection_hologram = encode_hologram(*fields, pixel_pitch=experiment.slm_config['pixel_pitch'], d=8, N_steps=8,  M=1, prepare=False, measure=True, save=False)
                         slm[1].imshow(projection_hologram)
 
                         time.sleep(0.2)

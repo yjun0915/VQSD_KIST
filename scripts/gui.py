@@ -18,7 +18,7 @@ class VQSDExecuterGUI:
         self.current_dir = Path(__file__).parent
         self.recipe_path = self.current_dir.parent / "config" / "recipe.yaml"
         self.params_path = self.current_dir.parent / "config" / "params.yaml"
-        self.target_script = self.current_dir / "run_simulation.py"
+        self.target_script = self.current_dir / "run_experiment.py"
 
         self.setup_ui()
 
@@ -30,13 +30,13 @@ class VQSDExecuterGUI:
         # 입력 필드 정의
         self.inputs = {}
         fields = [
-            ("Dims", "7, 8"),
-            ("Lambda Vals", "0.8, 0.8"),
-            ("Overlaps", "0.25, 0.5, 0.75"),
+            ("Dims", "3"),
+            ("Lambda Vals", "1"),
+            ("Overlaps", "0.75"),
             ("Optimizers", "COBYLA, Nelder-Mead"),
-            ("Tols", "0.1, 0.01, 0.001"),
-            ("Q-Points", "10"),
-            ("Trials", "100")
+            ("Tols", "0.01"),
+            ("Q-Points", "1"),
+            ("Trials", "1")
         ]
 
         for i, (label, default) in enumerate(fields):
