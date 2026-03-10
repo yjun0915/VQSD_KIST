@@ -1,15 +1,19 @@
 settings:
-- dim: 3
+- dim: 4
+  lambda_val: 1.0
+  optimizer: COBYLA
+  overlap: 0.25
+  q_points: &id001
+  - 0.0
+  - 0.25
+  - 0.5
+  - 0.75
+  tol: 0.01
+  trial: 1
+- dim: 4
   lambda_val: 1.0
   optimizer: COBYLA
   overlap: 0.75
-  q_points: 1
-  tol: 0.01
-  trial: 1
-- dim: 3
-  lambda_val: 1.0
-  optimizer: Nelder-Mead
-  overlap: 0.75
-  q_points: 1
+  q_points: *id001
   tol: 0.01
   trial: 1

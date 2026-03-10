@@ -62,10 +62,9 @@ sim_history_filename = f"{current_time}_ov{overlap:.2f}_history.csv"
 sim_filepath = sim_dir / sim_filename
 sim_history_filepath = sim_dir / sim_history_filename
 
-q_points = minimize_params['q_points']
-fixed_rates = np.linspace(0, overlap, q_points)
-best_lagrangians = np.full(q_points, -np.inf)
-best_histories = [[] for _ in range(q_points)]
+fixed_rates = minimize_params['q_points']
+best_lagrangians = np.full(len(fixed_rates), -np.inf)
+best_histories = [[] for _ in range(len(fixed_rates))]
 for trial in trange(minimize_params['trial'], desc="Trials"):
     for fr_idx, fixed_rate in enumerate(fixed_rates):
         parameter_history = []
@@ -97,7 +96,7 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
         if lagrangian > best_lagrangians[fr_idx]:
             best_histories[fr_idx] = parameter_history
             best_lagrangians[fr_idx] = lagrangian
-history_dict = {f"{fixed_rates[i]:.3f}": pd.Series(best_histories[i]) for i in range(q_points)}
+history_dict = {f"{fixed_rates[i]:.3f}": pd.Series(best_histories[i]) for i in range(len(fixed_rates))}
 sim_history_df = pd.DataFrame(history_dict)
 sim_history_df.columns = pd.MultiIndex.from_product([["fixed rate"], sim_history_df.columns])
 

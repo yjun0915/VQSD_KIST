@@ -79,6 +79,12 @@ class Experiment:
                 self.l_modes = [-(int((d-1)/2)*spacing + 1)] + self.l_modes
 
         self.p_modes = np.zeros_like(self.l_modes).tolist()
+        if spacing == 2:
+            for idx, l in enumerate(self.l_modes):
+                self.p_modes[idx] = 9 - np.abs(l)
+                if np.abs(l) == 7:
+                    self.p_modes[idx] += 1
+
 
         self.state_holograms = {}
         for state in state_list:

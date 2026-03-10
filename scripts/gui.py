@@ -35,7 +35,7 @@ class VQSDExecuterGUI:
             ("Overlaps", "0.75"),
             ("Optimizers", "COBYLA, Nelder-Mead"),
             ("Tols", "0.01"),
-            ("Q-Points", "1"),
+            ("Q-Points", "0, 0.25, 0.5, 0.75"),
             ("Trials", "1")
         ]
 
@@ -70,7 +70,7 @@ class VQSDExecuterGUI:
             overlaps = [float(x.strip()) for x in self.inputs["Overlaps"].get().split(",")]
             optimizers = [x.strip() for x in self.inputs["Optimizers"].get().split(",")]
             tols = [float(x.strip()) for x in self.inputs["Tols"].get().split(",")]
-            q_points = int(self.inputs["Q-Points"].get())
+            q_points = [float(x.strip()) for x in self.inputs["Q-Points"].get().split(",")]
             trial = int(self.inputs["Trials"].get())
             return dims, lambdas, overlaps, optimizers, tols, q_points, trial
         except ValueError as e:
