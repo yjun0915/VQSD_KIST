@@ -9,19 +9,31 @@ from colorspacious import cspace_convert
 plt.rcParams.update({'font.size': 12, 'lines.linewidth': 2, 'axes.grid': False})
 
 
-def load_latest_file(directory, pattern="*.csv"):
+def load_latest_file(directory, pattern="*.csv", n=1):
+    """
+    n=1 이면 가장 최신 파일, n=2 이면 두 번째로 최신 파일을 불러옵니다.
+    """
     files = list(Path(directory).glob(pattern))
     if not files:
         return None
-    return max(files, key=lambda x: x.stat().st_mtime)
+
+    files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+
+    if n > len(files) or n < 1:
+        print(f"⚠️ 경고: {n}번째 파일을 찾을 수 없습니다. (총 파일 수: {len(files)}개)")
+        return None
+
+    selected_file = files[n - 1]
+    print(f"📁 불러온 파일 ({n}번째 최신): {selected_file.name}")  # 확인용 출력
+    return selected_file
 
 
-def plot_qsd_results(dim, overlap):
-    sim_dir = Path(f"../data/experiment/dim_{dim}")
+def plot_qsd_results(script, dim, overlap, n=1):
+    sim_dir = Path(f"../data/{script}/dim_{dim}")
     theory_path = Path(f"../data/theory/dim_{dim}/ov{overlap}.csv")
 
-    sim_path = load_latest_file(sim_dir, f"*_ov{overlap}.csv")
-    history_path = load_latest_file(sim_dir, f"*_ov{overlap}_history.csv")
+    sim_path = load_latest_file(sim_dir, f"*_ov{overlap}.csv", n=n)
+    history_path = load_latest_file(sim_dir, f"*_ov{overlap}_history.csv", n=n)
 
     if not sim_path or not theory_path:
         print("Cannot find data")
@@ -91,4 +103,4 @@ def plot_qsd_results(dim, overlap):
 
 
 if __name__ == "__main__":
-    plot_qsd_results(dim=4, overlap=0.75)
+    plot_qsd_results(script='experiment', dim=4, overlap=0.75, n=1)
