@@ -33,7 +33,7 @@ class VQSDExecuterGUI:
             ("Dims", "3"),
             ("Lambda Vals", "1"),
             ("Overlaps", "0.75"),
-            ("Optimizers", "COBYLA, Nelder-Mead"),
+            ("Optimizers", "COBYLA"),
             ("Tols", "0.01"),
             ("Q-Points", "0, 0.25, 0.5, 0.75"),
             ("Trials", "1")
