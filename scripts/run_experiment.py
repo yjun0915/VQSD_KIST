@@ -66,10 +66,9 @@ raw_history_filename = f"{current_time}_ov{overlap:.2f}_history.csv"
 raw_filepath = raw_dir / raw_filename
 raw_history_filepath = raw_dir / raw_history_filename
 
-q_points = minimize_params['q_points']
-fixed_rates = np.linspace(0, overlap, q_points)
-best_lagrangians = np.full(q_points, -np.inf)
-best_histories = [[] for _ in range(q_points)]
+fixed_rates = minimize_params['q_points']
+best_lagrangians = np.full(len(fixed_rates), -np.inf)
+best_histories = [[] for _ in range(len(fixed_rates))]
 
 timetagger_config = config['devices']['timetagger']
 with timetagger_session(timetagger_config['cw'], timetagger_config['binwidth'], timetagger_config['n_value'], timetagger_config['delay']) as timetagger:
@@ -134,7 +133,7 @@ with timetagger_session(timetagger_config['cw'], timetagger_config['binwidth'], 
                     best_histories[fr_idx] = parameter_history
                     best_lagrangians[fr_idx] = lagrangian
 
-history_dict = {f"{fixed_rates[i]:.3f}": pd.Series(best_histories[i]) for i in range(q_points)}
+history_dict = {f"{fixed_rates[i]:.3f}": pd.Series(best_histories[i]) for i in range(len(fixed_rates))}
 sim_history_df = pd.DataFrame(history_dict)
 sim_history_df.columns = pd.MultiIndex.from_product([["fixed rate"], sim_history_df.columns])
 
