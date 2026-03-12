@@ -1,15 +1,11 @@
 columns:
   raw data:
-  - overlap
-  - trial
-  - fixed rate
-  - success rate
-  - error rate
-  - failure rate
-  - lagrangian
-  - lambda
-  - method
-  - maxiter
+  - timestamp
+  - optimizer
+  - lamda_val
+  - fixed_rate
+  - history
+  - raw_data
   sim data:
   - timestamp
   - optimizer
