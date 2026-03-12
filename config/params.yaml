@@ -46,7 +46,7 @@ minimize:
   - 0.25
   - 0.5
   - 0.75
-  trial: 1
+  trial: 10
 optimization:
   COBYLA:
     method: COBYLA

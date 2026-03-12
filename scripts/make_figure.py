@@ -9,42 +9,30 @@ from colorspacious import cspace_convert
 plt.rcParams.update({'font.size': 12, 'lines.linewidth': 2, 'axes.grid': False})
 
 
-def load_latest_file(directory, pattern="*.csv", n=1):
-    """
-    n=1 이면 가장 최신 파일, n=2 이면 두 번째로 최신 파일을 불러옵니다.
-    """
-    files = list(Path(directory).glob(pattern))
-    if not files:
+def load_file(directory, pattern="*.csv"):
+    file = list(Path(directory).glob(pattern))
+    if not file:
         return None
-
-    files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
-
-    if n > len(files) or n < 1:
-        print(f"⚠️ 경고: {n}번째 파일을 찾을 수 없습니다. (총 파일 수: {len(files)}개)")
-        return None
-
-    selected_file = files[n - 1]
-    print(f"📁 불러온 파일 ({n}번째 최신): {selected_file.name}")  # 확인용 출력
-    return selected_file
+    return file[0]
 
 
-def plot_qsd_results(script, dim, overlap, n=1):
-    sim_dir = Path(f"../data/{script}/dim_{dim}")
+def plot_qsd_results(script, dim, overlap):
+    dir = Path(f"../data/{script}/dim_{dim}")
     theory_path = Path(f"../data/theory/dim_{dim}/ov{overlap}.csv")
 
-    sim_path = load_latest_file(sim_dir, f"*_ov{overlap}.csv", n=n)
-    history_path = load_latest_file(sim_dir, f"*_ov{overlap}_history.csv", n=n)
+    path = load_file(dir, f"ov{overlap}.csv")
 
-    if not sim_path or not theory_path:
+    if not path or not theory_path:
         print("Cannot find data")
         return
 
     df_theory = pd.read_csv(theory_path)
-    df_sim = pd.read_csv(sim_path)
+    df = pd.read_csv(path)
+    print(df)
 
     cols = ['success rate', 'error rate', 'failure rate']
-    row_sums = df_sim[cols].sum(axis=1)
-    df_sim[cols] = df_sim[cols].div(row_sums, axis=0)
+    row_sums = df[cols].sum(axis=1)
+    df[cols] = df[cols].div(row_sums, axis=0)
 
     fig, (ax1, ax0) = plt.subplots(1, 2, figsize=(10.46, 6), gridspec_kw={'width_ratios': [1, 1.81]})
     ax2 = ax1.twinx()
@@ -53,7 +41,7 @@ def plot_qsd_results(script, dim, overlap, n=1):
     ax0.plot(df_theory['fixed rate'], df_theory['error rate'], label='SDP Bound (Theory)', color='firebrick', linestyle='-')
     ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], label='SDP Bound (Theory)', color='limegreen', linestyle='-')
 
-    best_sim = df_sim.loc[df_sim.groupby('fixed rate')['lagrangian'].idxmax()]
+    best_sim = df.loc[df.groupby('fixed rate')['lagrangian'].idxmax()]
 
     ax0.plot(best_sim['fixed rate'], best_sim['success rate'], 'o', color='dodgerblue', label='VQE Best Result')
     ax0.plot(best_sim['fixed rate'], best_sim['error rate'], 'o', color='firebrick', label='VQE Best Result')
@@ -186,4 +174,4 @@ def plot_qsd_results(script, dim, overlap, n=1):
 
 
 if __name__ == "__main__":
-    plot_qsd_results(script='simulation', dim=4, overlap=0.75, n=1)
+    plot_qsd_results(script='simulation', dim=3, overlap=0.75)
