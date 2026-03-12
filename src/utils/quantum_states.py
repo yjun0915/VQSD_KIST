@@ -51,16 +51,25 @@ def get_discrimination_rates(state, measure, prior_probability):
     P_fail = 0
     for state_idx, state in enumerate(state):
         prob = prior_probability[state_idx]
-        for povm_idx in range(len(measure)):
-            measurement = measure[f"M{povm_idx}"]
-            rho = state if np.array(state).ndim == 2 else np.outer(state, np.conj(state))
-            M = measurement if measurement.ndim == 2 else np.outer(measurement, np.conj(measurement))
-            if povm_idx == 0:
-                P_fail += prob * np.real(np.trace(rho @ M))
-            elif povm_idx - state_idx == 1:
-                P_success += prob * np.real(np.trace(rho @ M))
-            else:
-                P_error += prob * np.real(np.trace(rho @ M))
+        if np.array(state).ndim == 2:
+            for povm_idx in range(len(measure)):
+                measurement = measure[f"M{povm_idx}"]
+                if povm_idx == 0:
+                    P_fail += prob * np.real(np.trace(state @ measurement))
+                elif povm_idx - state_idx == 1:
+                    P_success += prob * np.real(np.trace(state @ measurement))
+                else:
+                    P_error += prob * np.real(np.trace(state @ measurement))
+        else:
+            for povm_idx in range(len(measure)):
+                measurement = measure[f"M{povm_idx}"]
+                if povm_idx == 0:
+                    P_fail += prob * (np.abs(np.vdot(state, measurement))) ** 2
+                elif povm_idx - state_idx == 1:
+                    P_success += prob * (np.abs(np.vdot(state, measurement))) ** 2
+                else:
+                    P_error += prob * (np.abs(np.vdot(state, measurement))) ** 2
+
     return P_success, P_error, P_fail
 
 

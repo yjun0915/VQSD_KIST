@@ -11,16 +11,12 @@ columns:
   - method
   - maxiter
   sim data:
-  - overlap
-  - trial
-  - fixed rate
-  - success rate
-  - error rate
-  - failure rate
-  - lagrangian
-  - lambda
-  - method
-  - maxiter
+  - timestamp
+  - optimizer
+  - lamda_val
+  - fixed_rate
+  - history
+  - raw_data
   theory:
   - overlap
   - fixed rate
@@ -45,7 +41,7 @@ flags:
   save_data: true
   use_dummy_slm: false
 minimize:
-  dim: 4
+  dim: 3
   lambda_val: 1.0
   optimizer: COBYLA
   overlap: 0.75
@@ -54,7 +50,7 @@ minimize:
   - 0.25
   - 0.5
   - 0.75
-  trial: 5
+  trial: 1
 optimization:
   COBYLA:
     method: COBYLA
@@ -63,13 +59,6 @@ optimization:
       maxiter: 10000
       rhobeg: 1.570796
     tol: 0.01
-  L-BFGS-B:
-    method: L-BFGS-B
-    options:
-      disp: false
-      ftol: 1.0e-08
-      maxiter: 1000
-    tol: 1.0e-07
   Nelder-Mead:
     method: Nelder-Mead
     options:
@@ -78,12 +67,5 @@ optimization:
       maxiter: 1000
       xatol: 0.0001
     tol: 0.01
-  Powell:
-    method: Powell
-    options:
-      disp: false
-      ftol: 1.0e-07
-      maxiter: 1000
-    tol: 1.0e-07
 simulation:
   q_points: 100

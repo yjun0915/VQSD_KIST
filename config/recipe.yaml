@@ -1,5 +1,5 @@
 settings:
-- dim: 4
+- dim: 3
   lambda_val: 1.0
   optimizer: COBYLA
   overlap: 0.75
@@ -9,4 +9,4 @@ settings:
   - 0.5
   - 0.75
   tol: 0.01
-  trial: 5
+  trial: 1
