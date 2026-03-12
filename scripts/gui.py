@@ -18,7 +18,6 @@ class VQSDExecuterGUI:
         self.current_dir = Path(__file__).parent
         self.recipe_path = self.current_dir.parent / "config" / "recipe.yaml"
         self.params_path = self.current_dir.parent / "config" / "params.yaml"
-        self.target_script = self.current_dir / "run_experiment.py"
 
         self.setup_ui()
 
@@ -36,7 +35,8 @@ class VQSDExecuterGUI:
             ("Optimizers", "COBYLA"),
             ("Tols", "0.01"),
             ("Q-Points", "0, 0.25, 0.5, 0.75"),
-            ("Trials", "1")
+            ("Trials", "1"),
+            ("simulation/experiment", "experiment")
         ]
 
         for i, (label, default) in enumerate(fields):
@@ -134,7 +134,7 @@ class VQSDExecuterGUI:
                 # 서브프로세스 실행
                 start_t = time.time()
                 result = subprocess.run(
-                    [sys.executable, str(self.target_script)],
+                    [sys.executable, str(self.current_dir / f"run_{self.inputs['simulation/experiment'].get()}.py")],
                     capture_output=True, text=True, encoding='utf-8'
                 )
 
