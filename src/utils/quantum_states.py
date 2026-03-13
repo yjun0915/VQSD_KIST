@@ -45,21 +45,22 @@ def unitary_matrix(params, n):
     return matrix
 
 
-def get_discrimination_rates(state, measure, prior_probability):
+def get_discrimination_rates(state, measure, prior_probability, noise):
     P_success = 0
     P_error = 0
     P_fail = 0
+    dim = len(state) + 1
     for state_idx, state in enumerate(state):
         prob = prior_probability[state_idx]
         if np.array(state).ndim == 2:
             for povm_idx in range(len(measure)):
                 measurement = measure[f"M{povm_idx}"]
                 if povm_idx == 0:
-                    P_fail += prob * np.real(np.trace(state @ measurement))
+                    P_fail += prob * ((np.real(np.trace(state @ measurement))*(1-noise)) + (noise/dim))
                 elif povm_idx - state_idx == 1:
-                    P_success += prob * np.real(np.trace(state @ measurement))
+                    P_success += prob * ((np.real(np.trace(state @ measurement))*(1-noise)) + (noise/dim))
                 else:
-                    P_error += prob * np.real(np.trace(state @ measurement))
+                    P_error += prob * ((np.real(np.trace(state @ measurement))*(1-noise)) + (noise/dim))
         else:
             for povm_idx in range(len(measure)):
                 measurement = measure[f"M{povm_idx}"]

@@ -45,7 +45,7 @@ def solve_sdp_bound(prepared_state_set, prior_probability, dim, fixed_rate):
     return optimal_measurements
 
 
-def cobyla_objective(x, state_list, prior_prob_list, dim, fixed_rate, _lambda):
+def cobyla_objective(x, state_list, prior_prob_list, dim, fixed_rate, _lambda, noise):
     """COBYLA 최적화에 사용될 내부 목적 함수"""
     vector_list = unitary_matrix(x, dim).T
 
@@ -53,7 +53,7 @@ def cobyla_objective(x, state_list, prior_prob_list, dim, fixed_rate, _lambda):
     for vector_idx, vector in enumerate(vector_list):
         measurements[f"M{np.mod(vector_idx + 1, dim)}"] = vector
 
-    success, error, fail = get_discrimination_rates(state_list, measurements, prior_prob_list)
+    success, error, fail = get_discrimination_rates(state_list, measurements, prior_prob_list, noise)
 
     return -(success - _lambda * (np.abs(fail - fixed_rate)))
 

@@ -39,12 +39,13 @@ flags:
 minimize:
   dim: 3
   lambda_val: 1.0
-  optimizer: COBYLA
+  optimizer: Nelder-Mead
   overlap: 0.75
   q_points:
   - 0.0
-  - 0.25
-  - 0.5
+  - 0.1875
+  - 0.3750
+  - 0.5625
   - 0.75
   trial: 10
 optimization:
@@ -62,6 +63,12 @@ optimization:
       fatol: 0.0001
       maxiter: 1000
       xatol: 0.0001
+    tol: 0.01
+  BFGS:
+    method: BFGS
+    options:
+      disp: false
+      maxiter: 1000
     tol: 0.01
 simulation:
   q_points: 100

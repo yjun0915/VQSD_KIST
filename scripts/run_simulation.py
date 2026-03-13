@@ -39,18 +39,19 @@ theory_filepath = theory_dir / theory_filename
 theory_rows = []
 for fixed_rate in np.linspace(0, 1, 100):
     optimal_measurements = solve_sdp_bound(prepared_state_set, prior_probability, dim, fixed_rate)
-    P_success, P_error, P_fail = get_discrimination_rates(rho_list, optimal_measurements, prior_probability)
+    P_success, P_error, P_fail = get_discrimination_rates(rho_list, optimal_measurements, prior_probability, noise = 0)
     theory_rows.append([overlap, fixed_rate, P_success, P_error, P_fail])
 theory_df = pd.DataFrame(theory_rows, columns=columns['theory'])
 theory_df.to_csv(theory_filepath, index=False)
 # endregion
 
+noise = 0.03
 
 start = time.time()
 # region simulation data
 dir = Path(f"../data/simulation/dim_{dim}")
 dir.mkdir(parents=True, exist_ok=True)
-filename = f"ov{overlap:.2f}.csv"
+filename = f"ov{overlap:.2f}_noise{noise}.csv"
 filepath = dir / filename
 is_new_file = not filepath.exists()
 
@@ -68,7 +69,7 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
         result = minimize(
             fun=tracking_objective,
             x0=initial_parameter,
-            args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val),
+            args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val, noise),
             **opt_config
         )
         lagrangian = -result.fun
@@ -78,7 +79,7 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
         for state_idx, state in enumerate(prepared_state_set):
             prob = prior_probability[state_idx]
             for vector_idx, vector in enumerate(vector_list):
-                raw_data[state_idx][vector_idx] = prob * (np.abs(np.vdot(state, vector))) ** 2
+                raw_data[state_idx][vector_idx] = prob * ((np.abs(np.vdot(state, vector))*(1-noise)) + (noise/dim)) ** 2
 
         current_time = datetime.now().strftime("%y%m%d%H%M%S")
         new_row_df = pd.DataFrame([{
