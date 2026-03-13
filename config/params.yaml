@@ -3,14 +3,14 @@ columns:
   - timestamp
   - optimizer
   - lamda_val
-  - fixed_rate
+  - fixed rate
   - history
   - raw_data
   sim data:
   - timestamp
   - optimizer
   - lamda_val
-  - fixed_rate
+  - fixed rate
   - history
   - raw_data
   theory:

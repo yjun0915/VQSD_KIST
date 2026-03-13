@@ -17,10 +17,8 @@ def load_file(directory, pattern="*.csv"):
 
 
 def plot_qsd_results(script, dim, overlap):
-    dir = Path(f"../data/{script}/dim_{dim}")
+    path = Path(f"../data/{script}/dim_{dim}/ov{overlap}.csv")
     theory_path = Path(f"../data/theory/dim_{dim}/ov{overlap}.csv")
-
-    path = load_file(dir, f"ov{overlap}.csv")
 
     if not path or not theory_path:
         print("Cannot find data")
@@ -28,7 +26,20 @@ def plot_qsd_results(script, dim, overlap):
 
     df_theory = pd.read_csv(theory_path)
     df = pd.read_csv(path)
-    print(df)
+
+    df['raw_data'] = df['raw_data'].apply(ast.literal_eval)
+    df['history'] = df['history'].apply(ast.literal_eval)
+
+    if script == 'simulation':
+        df['raw_data'] = df['raw_data'].apply(lambda m: np.array(m)*10000)
+
+    df['success rate'] = df['raw_data'].apply(lambda x: np.trace(x))
+    df['failure rate'] = df['raw_data'].apply(lambda x: np.sum(x[:, -1]))
+    df['error rate'] = df['raw_data'].apply(lambda x: np.sum(x)) - df['success rate'] - df['failure rate']
+    df['lagrangian'] = df['success rate'] - df['lambda_val']*np.abs(df['failure rate'] - df['fixed rate'])
+
+
+    print(df.iloc[0])
 
     cols = ['success rate', 'error rate', 'failure rate']
     row_sums = df[cols].sum(axis=1)
@@ -46,7 +57,7 @@ def plot_qsd_results(script, dim, overlap):
     ax0.plot(best_sim['fixed rate'], best_sim['success rate'], 'o', color='dodgerblue', label='VQE Best Result')
     ax0.plot(best_sim['fixed rate'], best_sim['error rate'], 'o', color='firebrick', label='VQE Best Result')
     ax0.plot(best_sim['fixed rate'], best_sim['failure rate'], 'o', color='limegreen', label='VQE Best Result')
-    # 마우스 오버 감지를 위해 데이터 포인트를 변수에 저장 (Numpy 배열로 변환하여 안전성 확보)
+
     x_data = best_sim['fixed rate'].to_numpy()
     y_succ = best_sim['success rate'].to_numpy()
     y_err = best_sim['error rate'].to_numpy()
@@ -65,7 +76,7 @@ def plot_qsd_results(script, dim, overlap):
     # ==========================================
 
     # History 데이터 미리 로드
-    df_hist = pd.read_csv(history_path) if history_path else None
+    df_hist = df['history']
 
     # 강조용 빈 마커 생성
     highlight, = ax0.plot([], [], 'o', markeredgecolor='black', markerfacecolor='none',
@@ -82,16 +93,8 @@ def plot_qsd_results(script, dim, overlap):
         ax1.clear()
         ax2.clear()
 
-        # 💡 주의: 데이터 저장 방식에 따라 df_hist.columns의 인덱스 오프셋이 필요할 수 있습니다.
-        # (예: index 컬럼이 저장되어 있다면 idx + 1 을 해야 할 수도 있음)
-        try:
-            col_name = df_hist.columns[idx]
-        except IndexError:
-            print("인덱스 범위를 초과했습니다.")
-            return
-
         # 데이터 파싱
-        trajectory_list = df_hist[col_name].dropna().apply(eval).tolist()
+        trajectory_list = list(map(list, zip(*df_hist[idx])))
         if not trajectory_list:
             return
 

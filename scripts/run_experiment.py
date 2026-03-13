@@ -114,7 +114,7 @@ with timetagger_session(cw, binwidth, n_value, delay) as timetagger:
                     'timestamp': current_time,
                     'optimizer': config['minimize']['optimizer'],
                     'lambda_val': lambda_val,
-                    'fixedrate': fixed_rate,
+                    'fixed rate': fixed_rate,
                     'history': list(map(list, zip(*parameter_history))),
                     'raw_data': raw_data
                 }])
