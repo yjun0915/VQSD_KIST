@@ -64,8 +64,8 @@ def plot_qsd_results(script, dim, overlap, noise=0):
     # region prepare canvas
     fig, (ax1, ax0) = plt.subplots(1, 2, figsize=(10.46, 6), gridspec_kw={'width_ratios': [1, 1.81]})
     ax2 = ax1.twinx()
-    ax_radio = plt.axes([0.85, 0.45, 0.135, 0.15], facecolor='lightgoldenrodyellow')
-    radio = RadioButtons(ax_radio, optimizers)
+    # ax_radio = plt.axes([0.85, 0.45, 0.135, 0.15], facecolor='lightgoldenrodyellow')
+    # radio = RadioButtons(ax_radio, optimizers)
     # endregion
 
     # region draw theoretical line
@@ -74,6 +74,9 @@ def plot_qsd_results(script, dim, overlap, noise=0):
     ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], label='SDP Bound (Theory)', color='limegreen', linestyle='-')
     # endregion
 
+
+#########################################
+    # 수정 할 부분
     state = {
         'current_opt': optimizers[0],
         'best_df': None,
@@ -117,7 +120,7 @@ def plot_qsd_results(script, dim, overlap, noise=0):
                           markeredgewidth=2, markersize=12, zorder=10, visible=False)
 
     hover_state = {'current_idx': None}
-
+#####################################################
 
     def update_trajectory(idx):
         if df_hist is None:
@@ -138,7 +141,6 @@ def plot_qsd_results(script, dim, overlap, noise=0):
         colors = [cspace_convert([70, 60, 360 * (theta / num_params)], "CIELCh", "sRGB1") for theta in
                   range(num_params)]
         colors = np.clip(colors, 0, 1)
-
         for i in range(int(dim * (dim - 1) / 2)):
             ax1.plot(trajectory[:, i], label=rf'$\theta_{i + 1}$', color=colors[i], linewidth=1)
         for i in range(int(dim * (dim - 1) / 2), (dim ** 2) - 1):
@@ -198,7 +200,7 @@ def plot_qsd_results(script, dim, overlap, noise=0):
 
     fig.canvas.mpl_connect('motion_notify_event', on_hover)
     fig.canvas.mpl_connect('button_press_event', on_click)
-    radio.on_clicked(update_main_plot)
+    # radio.on_clicked(update_main_plot)
 
     plt.tight_layout()
     plt.show()
