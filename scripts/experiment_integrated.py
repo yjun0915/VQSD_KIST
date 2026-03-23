@@ -176,9 +176,11 @@ for fr_idx, fixed_rate in enumerate(fixed_rates):
         fun=obj,
         x0=x0,
         method=opt_config['method'],
+        callback=callback,
         options={
+            'disp': False,
             'tol': opt_config['tol'],
-            'callback': callback,
+            'maxiter': 10000
         }
     )
 
