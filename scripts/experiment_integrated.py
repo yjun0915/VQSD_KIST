@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from TimeTagger import createTimeTagger, Resolution_Standard, Coincidences, Counter
-from tqdm import trange
+from tqdm import tqdm
 from scipy.optimize import minimize
 
 from src.utils.quantum_states import *
@@ -126,7 +126,7 @@ for state in prepared_state_set:
 # endregion
 
 start = time.time()
-for fr_idx, fixed_rate in enumerate(fixed_rates):
+for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
     parameter_history = []
     def obj(x):
         vector_list = unitary_matrix(x, dim).T
