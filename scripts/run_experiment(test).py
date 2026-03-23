@@ -54,13 +54,14 @@ start = time.time()
 # region experiment data
 dir = Path(f"../data/experiment/dim_{dim}")
 dir.mkdir(parents=True, exist_ok=True)
-filename = f"ov{overlap:.2f}_noise0.csv"
+filename = f"ov{overlap:.2f}_noise0.1.csv"
 filepath = dir / filename
 is_new_file = not filepath.exists()
 
 fixed_rates = minimize_params['q_points']
 timetagger_config = config['devices']['timetagger']
 cw, binwidth, n_value, delay = timetagger_config['cw'], timetagger_config['binwidth'], timetagger_config['n_value'], timetagger_config['delay']
+print(cw, binwidth, n_value, delay)
 with timetagger_session(cw, binwidth, n_value, delay) as timetagger:
     with slm_session() as slms:
         experiment = Experiment(timetagger, slms, prepared_state_set, dim)
@@ -85,7 +86,19 @@ with timetagger_session(cw, binwidth, n_value, delay) as timetagger:
                 raw_data = [[0 for __ in range(dim)] for _ in range(dim-1)]
                 vector_list = unitary_matrix(result.x, dim).T
                 for state_idx, state in enumerate(prepared_state_set):
-                    slms[0].imshow(experiment.state_holograms[str(state)])
+                    fields = generate_oam_superposition(
+                        res=experiment.slm_config['res'],
+                        pixel_pitch=experiment.slm_config['pixel_pitch'],
+                        beam_w0=experiment.slm_config['beam_w0'],
+                        l_modes=experiment.l_modes,
+                        p_modes=experiment.p_modes,
+                        weights=state,
+                        prepare=True,
+                        measure=False
+                    )
+                    slms[0].imshow(encode_hologram(*fields, pixel_pitch=experiment.slm_config['pixel_pitch'], d=8, N_steps=8, M=1, prepare=True, measure=False, save=False))
+                    encode_hologram(*fields, pixel_pitch=experiment.slm_config['pixel_pitch'], d=8, N_steps=8, M=1,
+                                    prepare=True, measure=False, save=True, path="./test", name=f"state{state_idx}")
                     for vector_idx, vector in enumerate(vector_list):
                         fields = generate_oam_superposition(
                             res=experiment.slm_config['res'],
@@ -98,30 +111,22 @@ with timetagger_session(cw, binwidth, n_value, delay) as timetagger:
                             measure=False
                         )
                         projection_hologram = encode_hologram(*fields, pixel_pitch=experiment.slm_config['pixel_pitch'], d=8, N_steps=8,  M=1, prepare=False, measure=True, save=False)
+                        encode_hologram(*fields, pixel_pitch=experiment.slm_config['pixel_pitch'], d=8, N_steps=8, M=1,
+                                        prepare=False, measure=True, save=True, path="./test", name=f"vector{vector_idx}")
                         slms[1].imshow(projection_hologram)
 
-                        time.sleep(0.2)
+                        timetagger.clear()
+
+                        time.sleep(binwidth*n_value/1000)
+                        print(binwidth*n_value/1000)
 
                         count_data = timetagger.getData()
                         A_channel_counts = np.sum(a=count_data, axis=1)[0]
                         B_channel_counts = np.sum(a=count_data, axis=1)[1]
                         coincidence_data = np.sum(a=count_data, axis=1)[2]
-                        coincidence_data -= max(0, A_channel_counts * B_channel_counts * cw * 1e-12)
+                        coincidence_data -= max(0, 2 * A_channel_counts * B_channel_counts * cw * 1e-12 / (binwidth*n_value/1000))
+
                         raw_data[state_idx][vector_idx] += float(prior_probability[state_idx] * coincidence_data)
 
-                current_time = datetime.now().strftime("%y%m%d%H%M%S")
-                new_row_df = pd.DataFrame([{
-                    'timestamp': current_time,
-                    'optimizer': config['minimize']['optimizer'],
-                    'lambda_val': lambda_val,
-                    'fixed rate': fixed_rate,
-                    'history': list(map(list, zip(*parameter_history))),
-                    'raw_data': raw_data
-                }])
-                new_row_df.to_csv(filepath, mode='a', index=False, header=is_new_file, encoding='utf-8-sig')
-                is_new_file = False
-# endregion
-end = time.time()
-elapsed_time_raw = end - start
-minutes, seconds = divmod(elapsed_time_raw, 60)
-time_str = f"{int(minutes)}m {seconds:.2f}s"
+                print(raw_data)
+
