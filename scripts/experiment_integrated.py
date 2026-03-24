@@ -21,7 +21,7 @@ prior_probability = [1/(dim-1) for _ in range(dim-1)] + [0]
 prepared_state_set = np.hstack((prepared_state_d_dim(dim-1, overlap), [[0] for _ in range(dim-1)]))
 rho_list = get_rho_list(prepared_state_set)
 
-cw, binwidth, n_value = 50, 50, 2
+cw, binwidth, n_value = 1000, 50, 4
 integration_time = binwidth*n_value/1000
 
 opt_config = {'method': "COBYLA", "tol": 0.01}
@@ -148,7 +148,6 @@ for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
                 projection_hologram = encode_hologram(*fields, pixel_pitch=8e-6, d=8, N_steps=8, M=1, prepare=False, measure=True, save=False)
                 slm2.imshow(projection_hologram)
 
-                counter.clear()
                 time.sleep(integration_time)
 
                 count_data = counter.getData()
@@ -167,8 +166,8 @@ for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
 
         return -(success - lambda_val*np.abs(failure - fixed_rate))
 
-    def callback(xk, intermediate_result):
-        parameter_history.append(xk.copy().tolist() + [float(-intermediate_result.fun)])
+    def callback(xk):
+        parameter_history.append(xk.copy().tolist() + [float(-obj(xk))])
         return 0
 
     x0 = np.random.uniform(0, 2 * np.pi, size=((dim ** 2) - 1))
@@ -204,14 +203,13 @@ for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
             projection_hologram = encode_hologram(*fields, pixel_pitch=8e-6, d=8, N_steps=8, M=1, prepare=False, measure=True, save=False)
             slm2.imshow(projection_hologram)
 
-            counter.clear()
             time.sleep(integration_time)
 
             count_data = counter.getData()
             A_channel_counts = np.sum(a=count_data, axis=1)[0]
             B_channel_counts = np.sum(a=count_data, axis=1)[1]
             coincidence_data = np.sum(a=count_data, axis=1)[2]
-            coincidence_data -= max(0, A_channel_counts * B_channel_counts * cw * 1e-12)
+            coincidence_data = np.round(max(0, coincidence_data - A_channel_counts * B_channel_counts * cw * 1e-12), 2)
             raw_data[state_idx][vector_idx] += float(prior_probability[state_idx] * coincidence_data)
     current_time = datetime.now().strftime("%y%m%d%H%M%S")
     new_row_df = pd.DataFrame([{
