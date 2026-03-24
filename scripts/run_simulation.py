@@ -47,7 +47,7 @@ theory_df = pd.DataFrame(theory_rows, columns=columns['theory'])
 theory_df.to_csv(theory_filepath, index=False)
 # endregion
 
-noise = 0.00
+noise = 0.0
 
 start = time.time()
 # region simulation data
@@ -68,16 +68,18 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
             return current_lagrangian
 
         initial_parameter = np.random.uniform(0, 2*np.pi, size=((dim**2) - 1))
-        # result = minimize(
-        #     fun=tracking_objective,
-        #     x0=initial_parameter,
-        #     args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val, noise),
-        #     **opt_config
-        # )
-        result = adam.adam(fun=tracking_objective,
-                     x0=initial_parameter,
-                     args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val, noise),
-                     maxiter=500)
+        if config['minimize']['optimizer'] != 'Adam':
+            result = minimize(
+                fun=tracking_objective,
+                x0=initial_parameter,
+                args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val, noise),
+                **opt_config
+            )
+        else:
+            result = adam.adam(fun=tracking_objective,
+                         x0=initial_parameter,
+                         args=(prepared_state_set, prior_probability, dim, fixed_rate, lambda_val, noise),
+                         maxiter=500)
         lagrangian = -result.fun
 
         raw_data = [[0 for __ in range(dim)] for _ in range(dim-1)]

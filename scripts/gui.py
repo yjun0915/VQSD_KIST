@@ -115,7 +115,7 @@ class VQSDExecuterGUI:
             total = len(settings)
             for i, current in enumerate(settings):
                 self.log(
-                    f"🔄 [{i + 1}/{total}] Running: Dim {current['dim']}, Ov {current['overlap']}, Tol {current['tol']}...")
+                    f"🔄 [{i + 1}/{total}] Running: Dim {current['dim']}, Ov {current['overlap']}, Tol {current['tol']}, Optmizer {current['optimizer']}...")
 
                 # params.yaml 업데이트
                 config['minimize'].update({

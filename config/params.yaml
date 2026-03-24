@@ -42,16 +42,32 @@ minimize:
   optimizer: COBYLA
   overlap: 0.75
   q_points:
-  - 0.3750
-  trial: 1
+  - 0.0
+  - 0.1875
+  - 0.375
+  - 0.5625
+  - 0.75
+  trial: 100
 optimization:
+  Adam:
+    method: Adam
+    options:
+      disp: false
+      maxiter: 1000
+    tol: 0.01
+  BFGS:
+    method: BFGS
+    options:
+      disp: false
+      maxiter: 1000
+    tol: 0.001
   COBYLA:
     method: COBYLA
     options:
       disp: false
-      maxiter: 1
+      maxiter: 10000
       rhobeg: 1.570796
-    tol: 0.01
+    tol: 0.001
   Nelder-Mead:
     method: Nelder-Mead
     options:
@@ -59,18 +75,6 @@ optimization:
       fatol: 0.0001
       maxiter: 1000
       xatol: 0.0001
-    tol: 0.01
-  BFGS:
-    method: BFGS
-    options:
-      disp: false
-      maxiter: 1000
-    tol: 0.01
-  Adam:
-    method: Adam
-    options:
-      disp: false
-      maxiter: 1000
-    tol: 0.01
+    tol: 0.001
 simulation:
   q_points: 100

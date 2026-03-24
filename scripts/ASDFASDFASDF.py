@@ -96,7 +96,7 @@ def plot_qsd_results(script, dim, overlap, noise=0):
         ax0.clear()
 
         # 3. 이론값(Theory) 다시 그리기 (clear 되면 지워지므로 여기서 매번 그려야 함)
-        ax0.plot(df_theory['fixed rate'], df_theory['success rate'], label='SDP Bound', color='dodgerblue',
+        ax0.plot(df_theory['fixed rate'], df_theory['success rate'], label='theory Bound', color='dodgerblue',
                  linestyle='-')
         ax0.plot(df_theory['fixed rate'], df_theory['error rate'], color='firebrick', linestyle='-')
         ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], color='limegreen', linestyle='-')

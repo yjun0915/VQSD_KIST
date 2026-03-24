@@ -55,7 +55,7 @@ def cobyla_objective(x, state_list, prior_prob_list, dim, fixed_rate, _lambda, n
 
     success, error, fail = get_discrimination_rates(state_list, measurements, prior_prob_list, noise)
 
-    return -(success - _lambda * (np.abs(fail - fixed_rate)))
+    return -(success - _lambda * ((fail - fixed_rate)**2))
 
 
 class Experiment:
@@ -140,4 +140,4 @@ class Experiment:
         success = np.trace(temp_rate)
         fail = np.sum(temp_rate[:, -1])
 
-        return -(success - _lambda * (np.abs(fail - fixed_rate)))
+        return -(success - _lambda * ((fail - fixed_rate)**2))

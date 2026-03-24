@@ -1,12 +1,13 @@
 settings:
 - dim: 3
   lambda_val: 1.0
-  optimizer: COBYLA
+  optimizer: BFGS
   overlap: 0.75
   q_points:
   - 0.0
-  - 0.25
-  - 0.5
+  - 0.1875
+  - 0.375
+  - 0.5625
   - 0.75
-  tol: 0.01
-  trial: 10
+  tol: 0.001
+  trial: 100
