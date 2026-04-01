@@ -107,7 +107,7 @@ with timetagger_session(cw, binwidth, n_value, delay) as timetagger:
                         B_channel_counts = np.sum(a=count_data, axis=1)[1]
                         coincidence_data = np.sum(a=count_data, axis=1)[2]
                         coincidence_data -= max(0, A_channel_counts * B_channel_counts * cw * 1e-12)
-                        raw_data[state_idx][vector_idx] += float(prior_probability[state_idx] * coincidence_data)
+                        raw_data[state_idx][vector_idx] += float(prior_probability[state_idx] * (coincidence_data**2))
 
                 current_time = datetime.now().strftime("%y%m%d%H%M%S")
                 new_row_df = pd.DataFrame([{

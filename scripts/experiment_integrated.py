@@ -21,7 +21,7 @@ prior_probability = [1/(dim-1) for _ in range(dim-1)] + [0]
 prepared_state_set = np.hstack((prepared_state_d_dim(dim-1, overlap), [[0] for _ in range(dim-1)]))
 rho_list = get_rho_list(prepared_state_set)
 
-cw, binwidth, n_value = 1000, 50, 4
+cw, binwidth, n_value = 1000, 50, 2
 integration_time = binwidth*n_value/1000
 
 opt_config = {'method': "COBYLA", "tol": 0.01}
@@ -155,7 +155,7 @@ for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
                 B_channel_counts = np.sum(a=count_data, axis=1)[1]
                 coincidence_data = np.sum(a=count_data, axis=1)[2]
                 coincidence_data -= max(0, A_channel_counts * B_channel_counts * cw * 1e-12)
-                temp_rate[state_idx][vector_idx] += prior_probability[state_idx]*coincidence_data
+                temp_rate[state_idx][vector_idx] += prior_probability[state_idx]*(coincidence_data**2)
 
         total_count = np.sum(temp_rate)
         if total_count > 0:
@@ -210,7 +210,7 @@ for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
             B_channel_counts = np.sum(a=count_data, axis=1)[1]
             coincidence_data = np.sum(a=count_data, axis=1)[2]
             coincidence_data = np.round(max(0, coincidence_data - A_channel_counts * B_channel_counts * cw * 1e-12), 2)
-            raw_data[state_idx][vector_idx] += float(prior_probability[state_idx] * coincidence_data)
+            raw_data[state_idx][vector_idx] += float(prior_probability[state_idx] * (coincidence_data**2))
     current_time = datetime.now().strftime("%y%m%d%H%M%S")
     new_row_df = pd.DataFrame([{
         'timestamp': current_time,

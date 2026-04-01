@@ -30,12 +30,12 @@ class VQSDExecuterGUI:
         self.inputs = {}
         fields = [
             ("Dims", "3"),
-            ("Lambda Vals", "1"),
+            ("Lambda Vals", "300"),
             ("Overlaps", "0.75"),
             ("Optimizers", "COBYLA"),
             ("Tols", "0.01"),
             ("Q-Points", "0, 0.1875, 0.375, 0.5625, 0.75"),
-            ("Trials", "1"),
+            ("Trials", "10"),
             ("simulation/experiment", "experiment")
         ]
 
