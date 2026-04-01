@@ -34,7 +34,7 @@ class VQSDExecuterGUI:
             ("Overlaps", "0.75"),
             ("Optimizers", "COBYLA"),
             ("Tols", "0.01"),
-            ("Q-Points", "0, 0.25, 0.5, 0.75"),
+            ("Q-Points", "0, 0.1875, 0.375, 0.5625, 0.75"),
             ("Trials", "1"),
             ("simulation/experiment", "experiment")
         ]

@@ -40,7 +40,7 @@ def plot_qsd_results(script, dim, overlap, noise=0):
     # endregion
 
     if script == 'simulation':
-        df['raw_data'] = df['raw_data'].apply(lambda m: np.array(m)*100)
+        df['raw_data'] = df['raw_data'].apply(lambda m: np.array(m)*1000)
 
     # region data preprocessing
     cols = ['success rate', 'failure rate', 'error rate', 'success std', 'failure std', 'error std']
@@ -64,8 +64,8 @@ def plot_qsd_results(script, dim, overlap, noise=0):
     # region prepare canvas
     fig, (ax1, ax0) = plt.subplots(1, 2, figsize=(10.46, 6), gridspec_kw={'width_ratios': [1, 1.81]})
     ax2 = ax1.twinx()
-    # ax_radio = plt.axes([0.85, 0.45, 0.135, 0.15], facecolor='lightgoldenrodyellow')
-    # radio = RadioButtons(ax_radio, optimizers)
+    ax_radio = plt.axes([0.85, 0.45, 0.135, 0.15], facecolor='lightgoldenrodyellow')
+    radio = RadioButtons(ax_radio, optimizers)
     # endregion
 
     # region draw theoretical line
@@ -74,64 +74,73 @@ def plot_qsd_results(script, dim, overlap, noise=0):
     ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], label='SDP Bound (Theory)', color='limegreen', linestyle='-')
     # endregion
 
-
-#########################################
-    # 수정 할 부분
+    #########################################
+    # 🌟 상태 관리 및 메인 플롯 업데이트 로직
+    #########################################
     state = {
         'current_opt': optimizers[0],
         'best_df': None,
         'current_idx': None,
-        'scatters': []  # 매번 지우고 다시 그릴 scatter/errorbar 객체들
+        'scatters': [],  # Hover 감지용 투명 마커들
+        'highlight': None  # 클릭/호버 시 강조되는 마커
     }
 
+    def update_main_plot(opt_name):
+        state['current_opt'] = opt_name
 
-    def update_main_plot(idx):
-        return
-    # best_df = df.loc[df.groupby('fixed rate')['lagrangian'].idxmax()]
-    df['constraint_error'] = (df['lagrangian'] - df['success rate']).abs()
-    best_idx = df.groupby('fixed rate')['constraint_error'].idxmin()
-    best_df = df.loc[best_idx]
+        # 1. 해당 옵티마이저 데이터만 필터링 후 인덱스 리셋
+        cur_df = best_df_all[best_df_all['optimizer'] == opt_name].reset_index(drop=True)
+        state['best_df'] = cur_df
 
-    ax0.errorbar(best_df['fixed rate'], best_df['success rate'], yerr=best_df['success std'].to_numpy(), fmt='o', color='dodgerblue', ecolor='dodgerblue', elinewidth=1, capsize=2, label='Success (MC Error)')
-    ax0.errorbar(best_df['fixed rate'], best_df['error rate'], yerr=best_df['error std'].to_numpy(), fmt='o', color='firebrick', ecolor='firebrick', elinewidth=1, capsize=2, label='Success (MC Error)')
-    ax0.errorbar(best_df['fixed rate'], best_df['failure rate'], yerr=best_df['failure std'].to_numpy(), fmt='o', color='limegreen', ecolor='limegreen', elinewidth=1, capsize=2, label='Success (MC Error)')
+        # 2. 우측 그래프(ax0) 초기화
+        ax0.clear()
 
-    x_data = best_df['fixed rate'].to_numpy()
-    y_succ = best_df['success rate'].to_numpy()
-    y_err = best_df['error rate'].to_numpy()
-    y_fail = best_df['failure rate'].to_numpy()
+        # 3. 이론값(Theory) 다시 그리기 (clear 되면 지워지므로 여기서 매번 그려야 함)
+        ax0.plot(df_theory['fixed rate'], df_theory['success rate'], label='theory Bound', color='dodgerblue',
+                 linestyle='-')
+        ax0.plot(df_theory['fixed rate'], df_theory['error rate'], color='firebrick', linestyle='-')
+        ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], color='limegreen', linestyle='-')
 
-    p_succ, = ax0.plot(x_data, y_succ, 'o', color='dodgerblue', label='VQE Best Result')
-    p_err, = ax0.plot(x_data, y_err, 'o', color='firebrick', label='VQE Best Result')
-    p_fail, = ax0.plot(x_data, y_fail, 'o', color='limegreen', label='VQE Best Result')
+        # 4. 선택된 옵티마이저의 에러바 플로팅
+        ax0.errorbar(cur_df['fixed rate'], cur_df['success rate'], yerr=cur_df['success std'], fmt='o',
+                     color='dodgerblue', capsize=2, label='Success')
+        ax0.errorbar(cur_df['fixed rate'], cur_df['error rate'], yerr=cur_df['error std'], fmt='o', color='firebrick',
+                     capsize=2, label='Error')
+        ax0.errorbar(cur_df['fixed rate'], cur_df['failure rate'], yerr=cur_df['failure std'], fmt='o',
+                     color='limegreen', capsize=2, label='Failure')
 
-    ax0.set_xlabel('Fixed Rate')
-    ax0.set_ylabel('Probability')
-    ax0.set_title(f'Quantum State Discrimination (Dim={dim}, Overlap={overlap})')
-    # ==========================================
-    # 🌟 인터랙티브 로직 (Hover & Click)
-    # ==========================================
+        # 5. 마우스 호버(Hover) 감지용 투명 Scatter 객체 생성
+        p_succ = ax0.scatter(cur_df['fixed rate'], cur_df['success rate'], s=100, picker=5, alpha=0)
+        p_err = ax0.scatter(cur_df['fixed rate'], cur_df['error rate'], s=100, picker=5, alpha=0)
+        p_fail = ax0.scatter(cur_df['fixed rate'], cur_df['failure rate'], s=100, picker=5, alpha=0)
+        state['scatters'] = [p_succ, p_err, p_fail]
 
-    # History 데이터 미리 로드
-    df_hist = df['history']
+        # 6. 하이라이트 빈 마커 재생성
+        state['highlight'], = ax0.plot([], [], 'o', markeredgecolor='black', markerfacecolor='none',
+                                       markeredgewidth=2, markersize=12, zorder=10, visible=False)
 
-    # 강조용 빈 마커 생성
-    highlight, = ax0.plot([], [], 'o', markeredgecolor='black', markerfacecolor='none',
-                          markeredgewidth=2, markersize=12, zorder=10, visible=False)
+        # 7. 그래프 꾸미기
+        ax0.set_xlabel('Fixed Rate')
+        ax0.set_ylabel('Probability')
+        ax0.set_title(f'VQSD Result [{opt_name}] (Dim={dim}, Overlap={overlap})')
+        ax0.legend(loc='upper right', fontsize=10)
 
-    hover_state = {'current_idx': None}
-#####################################################
+        # 8. 옵티마이저가 바뀌었으니 좌측 궤적 그래프도 첫 번째(0) 데이터로 갱신
+        state['current_idx'] = None
+        update_trajectory(0)
+        fig.canvas.draw_idle()
 
     def update_trajectory(idx):
-        if df_hist is None:
+        cur_df = state['best_df']
+        if cur_df is None or len(cur_df) == 0:
             return
 
-        # 기존에 그려진 그래프 초기화 (clear를 하면 label 등도 지워지므로 다시 세팅 필요)
         ax1.clear()
         ax2.clear()
 
-        # 데이터 파싱
-        trajectory_list = list(map(list, zip(*df_hist[idx])))
+        # 현재 옵티마이저 데이터프레임에서 history 로드
+        history_raw = cur_df.iloc[idx]['history']
+        trajectory_list = list(map(list, zip(*history_raw)))
         if not trajectory_list:
             return
 
@@ -141,6 +150,7 @@ def plot_qsd_results(script, dim, overlap, noise=0):
         colors = [cspace_convert([70, 60, 360 * (theta / num_params)], "CIELCh", "sRGB1") for theta in
                   range(num_params)]
         colors = np.clip(colors, 0, 1)
+
         for i in range(int(dim * (dim - 1) / 2)):
             ax1.plot(trajectory[:, i], label=rf'$\theta_{i + 1}$', color=colors[i], linewidth=1)
         for i in range(int(dim * (dim - 1) / 2), (dim ** 2) - 1):
@@ -149,8 +159,8 @@ def plot_qsd_results(script, dim, overlap, noise=0):
 
         ax1.set_xlabel('Optimization Iterations')
         ax1.set_ylabel('Parameter Value (rad)', color='k')
-        Q = best_df.iloc[idx]['fixed rate']
-        ax1.set_title(f'Trajectory (fixed rate = {Q})')
+        Q = cur_df.iloc[idx]['fixed rate']
+        ax1.set_title(f'Trajectory (Rate = {Q:.3f})')
 
         ax2.set_ylabel('Lagrangian Value', color='k')
         ax2.tick_params(axis='y', labelcolor='k')
@@ -160,51 +170,54 @@ def plot_qsd_results(script, dim, overlap, noise=0):
 
     def on_hover(event):
         if event.inaxes != ax0:
-            if highlight.get_visible():
-                highlight.set_visible(False)
-                hover_state['current_idx'] = None
+            if state['highlight'] and state['highlight'].get_visible():
+                state['highlight'].set_visible(False)
+                state['current_idx'] = None
                 fig.canvas.draw_idle()
             return
 
+        cur_df = state['best_df']
         is_hovered = False
-        for line in [p_succ, p_err, p_fail]:
-            cont, ind_dict = line.contains(event)
+        for scatter_obj in state['scatters']:
+            cont, ind_dict = scatter_obj.contains(event)
             if cont:
                 is_hovered = True
                 idx = ind_dict['ind'][0]
 
-                if hover_state['current_idx'] != idx:
-                    target_x = [x_data[idx], x_data[idx], x_data[idx]]
-                    target_y = [y_succ[idx], y_err[idx], y_fail[idx]]
-
-                    highlight.set_data(target_x, target_y)
-                    highlight.set_visible(True)
-                    hover_state['current_idx'] = idx
+                if state['current_idx'] != idx:
+                    target_x = cur_df.iloc[idx]['fixed rate']
+                    target_y = [cur_df.iloc[idx]['success rate'], cur_df.iloc[idx]['error rate'],
+                                cur_df.iloc[idx]['failure rate']]
+                    state['highlight'].set_data([target_x] * 3, target_y)
+                    state['highlight'].set_visible(True)
+                    state['current_idx'] = idx
                     fig.canvas.draw_idle()
                 break
 
-        if not is_hovered and highlight.get_visible():
-            highlight.set_visible(False)
-            hover_state['current_idx'] = None
+        if not is_hovered and state['highlight'].get_visible():
+            state['highlight'].set_visible(False)
+            state['current_idx'] = None
             fig.canvas.draw_idle()
 
     def on_click(event):
-        if event.inaxes == ax0 and event.button == 1:  # 1은 마우스 좌클릭
-            idx = hover_state['current_idx']
+        if event.inaxes == ax0 and event.button == 1:
+            idx = state['current_idx']
             if idx is not None:
                 print(f"🖱️ Clicked Fixed Rate index: {idx}, Updating Trajectory...")
                 update_trajectory(idx)
 
-    update_main_plot(0)
-    update_trajectory(0)
-
+    # 이벤트 연결 및 초기화
     fig.canvas.mpl_connect('motion_notify_event', on_hover)
     fig.canvas.mpl_connect('button_press_event', on_click)
-    # radio.on_clicked(update_main_plot)
+    radio.on_clicked(update_main_plot)
 
+    # 첫 번째 옵티마이저로 초기 플롯 렌더링
+    update_main_plot(optimizers[0])
+
+    # 레이아웃 깨짐 방지를 위해 ax_radio 위치가 적용된 뒤에 tight_layout 호출 시 주의 (필요 시 제외)
     plt.tight_layout()
     plt.show()
 
 
 if __name__ == "__main__":
-    plot_qsd_results(script='experiment', dim=3, overlap=0.75, noise=0)
+    plot_qsd_results(script='experiment', dim=3, overlap=0.75, noise=0.1)
