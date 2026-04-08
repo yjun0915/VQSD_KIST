@@ -37,8 +37,8 @@ flags:
   save_data: true
   use_dummy_slm: false
 minimize:
-  dim: 3
-  lambda_val: 300.0
+  dim: 5
+  lambda_val: 60.0
   optimizer: COBYLA
   overlap: 0.75
   q_points:
@@ -67,7 +67,7 @@ optimization:
       disp: false
       maxiter: 10000
       rhobeg: 1.570796
-    tol: 0.001
+    tol: 0.01
   Nelder-Mead:
     method: Nelder-Mead
     options:

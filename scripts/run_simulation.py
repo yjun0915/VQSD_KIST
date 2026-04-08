@@ -87,7 +87,7 @@ for trial in trange(minimize_params['trial'], desc="Trials"):
         for state_idx, state in enumerate(prepared_state_set):
             prob = prior_probability[state_idx]
             for vector_idx, vector in enumerate(vector_list):
-                raw_data[state_idx][vector_idx] = prob * ((np.abs(np.vdot(state, vector))*(1-noise)) + (noise/dim)) ** 2
+                raw_data[state_idx][vector_idx] = prob * (((np.abs(np.vdot(state, vector)) ** 2)*(1-noise)) + (noise/dim))
 
         current_time = datetime.now().strftime("%y%m%d%H%M%S")
         new_row_df = pd.DataFrame([{

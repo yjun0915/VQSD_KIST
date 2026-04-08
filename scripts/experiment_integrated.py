@@ -141,9 +141,9 @@ for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
                     beam_w0=0.8e-3,
                     l_modes=l_modes,
                     p_modes=p_modes,
-                    weights=vector.conj(),
-                    prepare=True,
-                    measure=False
+                    weights=vector,
+                    prepare=False,
+                    measure=True
                 )
                 projection_hologram = encode_hologram(*fields, pixel_pitch=8e-6, d=8, N_steps=8, M=1, prepare=False, measure=True, save=False)
                 slm2.imshow(projection_hologram)
@@ -196,9 +196,9 @@ for fr_idx, fixed_rate in enumerate(tqdm(fixed_rates)):
                 beam_w0=0.8e-3,
                 l_modes=l_modes,
                 p_modes=p_modes,
-                weights=vector.conj(),
-                prepare=True,
-                measure=False
+                weights=vector,
+                prepare=False,
+                measure=True
             )
             projection_hologram = encode_hologram(*fields, pixel_pitch=8e-6, d=8, N_steps=8, M=1, prepare=False, measure=True, save=False)
             slm2.imshow(projection_hologram)

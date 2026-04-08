@@ -41,16 +41,35 @@ def plot_qsd_results(script, dim, overlap, noise=0):
 
     if script == 'simulation':
         df['raw_data'] = df['raw_data'].apply(lambda m: np.array(m)*1000)
+    else:
+        df['raw_data'] = df['raw_data'].apply(lambda m: np.array(m)*dim)
+
 
     # region data preprocessing
     cols = ['success rate', 'failure rate', 'error rate', 'success std', 'failure std', 'error std']
     df[cols] = df['raw_data'].apply(get_monte_carlo_error)
     df['lagrangian'] = df['success rate'] - df['lambda_val']*np.abs(df['failure rate']-df['fixed rate'])
     df['constraint_error'] = (df['lagrangian'] - df['success rate']).abs()
+
+    rms_list = []
+
+    for idx, row in df.iterrows():
+        fixed_rate_val = row['fixed rate']
+
+        fixed_rate_idx = np.abs(df_theory['fixed rate'] - fixed_rate_val).argmin()
+
+        succ_diff = df_theory.iloc[fixed_rate_idx]['success rate'] - row['success rate']
+        error_diff = df_theory.iloc[fixed_rate_idx]['error rate'] - row['error rate']
+        fail_diff = df_theory.iloc[fixed_rate_idx]['failure rate'] - row['failure rate']
+
+        rms = np.sqrt((succ_diff ** 2 + error_diff ** 2 + fail_diff ** 2) / 3)
+        rms_list.append(rms)
+
+    df['rms'] = rms_list
     # endregion
 
     # region data selection
-    best_idx = df.groupby(['optimizer', 'fixed rate'])['constraint_error'].idxmin()
+    best_idx = df.groupby(['optimizer', 'fixed rate'])['rms'].idxmin()
     best_df_all = df.loc[best_idx].sort_values(['optimizer', 'fixed rate']).reset_index(drop=True)
     # endregion
 
@@ -64,8 +83,8 @@ def plot_qsd_results(script, dim, overlap, noise=0):
     # region prepare canvas
     fig, (ax1, ax0) = plt.subplots(1, 2, figsize=(10.46, 6), gridspec_kw={'width_ratios': [1, 1.81]})
     ax2 = ax1.twinx()
-    ax_radio = plt.axes([0.85, 0.45, 0.135, 0.15], facecolor='lightgoldenrodyellow')
-    radio = RadioButtons(ax_radio, optimizers)
+    # ax_radio = plt.axes([0.85, 0.45, 0.135, 0.15], facecolor='lightgoldenrodyellow')
+    # radio = RadioButtons(ax_radio, optimizers)
     # endregion
 
     # region draw theoretical line
@@ -96,18 +115,18 @@ def plot_qsd_results(script, dim, overlap, noise=0):
         ax0.clear()
 
         # 3. 이론값(Theory) 다시 그리기 (clear 되면 지워지므로 여기서 매번 그려야 함)
-        ax0.plot(df_theory['fixed rate'], df_theory['success rate'], label='theory Bound', color='dodgerblue',
+        ax0.plot(df_theory['fixed rate'], df_theory['success rate'], label='success theory', color='dodgerblue',
                  linestyle='-')
-        ax0.plot(df_theory['fixed rate'], df_theory['error rate'], color='firebrick', linestyle='-')
-        ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], color='limegreen', linestyle='-')
+        ax0.plot(df_theory['fixed rate'], df_theory['error rate'], label='error theory', color='firebrick', linestyle='-')
+        ax0.plot(df_theory['fixed rate'], df_theory['failure rate'], label='fail theory', color='limegreen', linestyle='-')
 
         # 4. 선택된 옵티마이저의 에러바 플로팅
         ax0.errorbar(cur_df['fixed rate'], cur_df['success rate'], yerr=cur_df['success std'], fmt='o',
-                     color='dodgerblue', capsize=2, label='Success')
+                     color='dodgerblue', capsize=2, label='success')
         ax0.errorbar(cur_df['fixed rate'], cur_df['error rate'], yerr=cur_df['error std'], fmt='o', color='firebrick',
-                     capsize=2, label='Error')
+                     capsize=2, label='error')
         ax0.errorbar(cur_df['fixed rate'], cur_df['failure rate'], yerr=cur_df['failure std'], fmt='o',
-                     color='limegreen', capsize=2, label='Failure')
+                     color='limegreen', capsize=2, label='fail')
 
         # 5. 마우스 호버(Hover) 감지용 투명 Scatter 객체 생성
         p_succ = ax0.scatter(cur_df['fixed rate'], cur_df['success rate'], s=100, picker=5, alpha=0)
@@ -123,7 +142,7 @@ def plot_qsd_results(script, dim, overlap, noise=0):
         ax0.set_xlabel('Fixed Rate')
         ax0.set_ylabel('Probability')
         ax0.set_title(f'VQSD Result [{opt_name}] (Dim={dim}, Overlap={overlap})')
-        ax0.legend(loc='upper right', fontsize=10)
+        ax0.legend(loc='right', fontsize=10)
 
         # 8. 옵티마이저가 바뀌었으니 좌측 궤적 그래프도 첫 번째(0) 데이터로 갱신
         state['current_idx'] = None
@@ -209,7 +228,7 @@ def plot_qsd_results(script, dim, overlap, noise=0):
     # 이벤트 연결 및 초기화
     fig.canvas.mpl_connect('motion_notify_event', on_hover)
     fig.canvas.mpl_connect('button_press_event', on_click)
-    radio.on_clicked(update_main_plot)
+    # radio.on_clicked(update_main_plot)
 
     # 첫 번째 옵티마이저로 초기 플롯 렌더링
     update_main_plot(optimizers[0])
@@ -220,4 +239,4 @@ def plot_qsd_results(script, dim, overlap, noise=0):
 
 
 if __name__ == "__main__":
-    plot_qsd_results(script='experiment', dim=3, overlap=0.75, noise=0.1)
+    plot_qsd_results(script='experiment', dim=4, overlap=0.75, noise=0)
