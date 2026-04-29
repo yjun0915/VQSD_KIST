@@ -131,7 +131,7 @@ class Experiment:
                 B_channel_counts = np.sum(a=count_data, axis=1)[1]
                 coincidence_data = np.sum(a=count_data, axis=1)[2]
                 coincidence_data -= max(0, A_channel_counts * B_channel_counts * self.cw * 1e-12)
-                temp_rate[state_idx][vector_idx] += prior_prob_list[state_idx]*(coincidence_data**2)
+                temp_rate[state_idx][vector_idx] += prior_prob_list[state_idx]*coincidence_data
 
         total_counts = np.sum(temp_rate)
         if total_counts > 0:

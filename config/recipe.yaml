@@ -1,13 +1,41 @@
 settings:
-- dim: 5
-  lambda_val: 60.0
+- dim: 6
+  lambda_val: 1.0
   optimizer: COBYLA
   overlap: 0.75
-  q_points:
+  q_points: &id001
   - 0.0
   - 0.1875
   - 0.375
   - 0.5625
   - 0.75
-  tol: 0.01
+  tol: 0.001
+  trial: 100
+- dim: 6
+  lambda_val: 15.0
+  optimizer: COBYLA
+  overlap: 0.75
+  q_points: *id001
+  tol: 0.001
+  trial: 100
+- dim: 6
+  lambda_val: 20.0
+  optimizer: COBYLA
+  overlap: 0.75
+  q_points: *id001
+  tol: 0.001
+  trial: 100
+- dim: 6
+  lambda_val: 25.0
+  optimizer: COBYLA
+  overlap: 0.75
+  q_points: *id001
+  tol: 0.001
+  trial: 100
+- dim: 6
+  lambda_val: 50.0
+  optimizer: COBYLA
+  overlap: 0.75
+  q_points: *id001
+  tol: 0.001
   trial: 100

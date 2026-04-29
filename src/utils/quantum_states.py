@@ -46,31 +46,27 @@ def unitary_matrix(params, n):
 
 
 def get_discrimination_rates(state, measure, prior_probability, noise):
-    P_success = 0
-    P_error = 0
-    P_fail = 0
     dim = len(state) + 1
+
+    temp_matrix = [[0 for _ in range(dim)] for __ in range(dim-1)]
     for state_idx, state in enumerate(state):
-        prob = prior_probability[state_idx]
         if np.array(state).ndim == 2:
             for povm_idx in range(len(measure)):
                 measurement = measure[f"M{povm_idx}"]
-                if povm_idx == 0:
-                    P_fail += prob * ((np.real(np.trace(state @ measurement))*(1-noise)) + (noise/dim))
-                elif povm_idx - state_idx == 1:
-                    P_success += prob * ((np.real(np.trace(state @ measurement))*(1-noise)) + (noise/dim))
-                else:
-                    P_error += prob * ((np.real(np.trace(state @ measurement))*(1-noise)) + (noise/dim))
+                temp_matrix[state_idx][povm_idx-1] = np.real(np.trace(state @ measurement))
         else:
             for povm_idx in range(len(measure)):
                 measurement = measure[f"M{povm_idx}"]
-                if povm_idx == 0:
-                    P_fail += prob * (np.abs(np.vdot(state, measurement))) ** 2
-                elif povm_idx - state_idx == 1:
-                    P_success += prob * (np.abs(np.vdot(state, measurement))) ** 2
-                else:
-                    P_error += prob * (np.abs(np.vdot(state, measurement))) ** 2
+                temp_matrix[state_idx][povm_idx-1] = np.abs(np.vdot(state, measurement))**2
+        temp_matrix = np.array(temp_matrix)
+    for row in range(temp_matrix.shape[0]):
+        prob = prior_probability[row]
+        temp_matrix[row] = temp_matrix[row]/np.sum(temp_matrix[row])
+        temp_matrix[row] = temp_matrix[row]*prob
 
+    P_success = np.trace(temp_matrix)
+    P_fail = np.sum(temp_matrix[:, -1])
+    P_error = np.sum(temp_matrix) - (P_success + P_fail)
     return P_success, P_error, P_fail
 
 
